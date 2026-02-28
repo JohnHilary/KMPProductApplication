@@ -8,4 +8,7 @@ class ApiService(
 ) {
     suspend fun getProducts() =
         client.get("/products")
+
+    suspend fun getCategories() =
+        client.get("/products/categories")
 }

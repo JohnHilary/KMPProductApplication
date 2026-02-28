@@ -1,5 +1,5 @@
 package com.john.kmpapplication.ui.product
 
- sealed interface ProductUiEvent {
-
- }
+sealed interface ProductUiEvent {
+    data class OnFilterItemClicked(val item: String) : ProductUiEvent
+}
