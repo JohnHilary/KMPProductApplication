@@ -1,4 +1,4 @@
-package com.john.kmpapplication.presentation.event
+package com.john.kmpapplication.ui.product
 
 sealed interface ProductUiEffect {
     data class ShowSnackbar(val message: String) : ProductUiEffect

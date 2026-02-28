@@ -1,9 +1,9 @@
-package com.john.kmpapplication
+package com.john.kmpapplication.ui
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.john.kmpapplication.presentation.navigation.NavigationHost
+import com.john.kmpapplication.ui.navigation.NavigationHost
 
 @Composable
 @Preview

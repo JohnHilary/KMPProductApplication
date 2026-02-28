@@ -1,4 +1,4 @@
-package com.john.kmpapplication.util
+package com.john.kmpapplication.data.remote
 
 import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse

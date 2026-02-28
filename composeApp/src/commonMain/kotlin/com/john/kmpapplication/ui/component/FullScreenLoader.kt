@@ -1,4 +1,4 @@
-package com.john.kmpapplication.presentation.component
+package com.john.kmpapplication.ui.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize

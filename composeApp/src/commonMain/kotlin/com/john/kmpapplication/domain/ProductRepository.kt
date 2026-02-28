@@ -1,7 +1,8 @@
-package com.john.kmpapplication.data
+package com.john.kmpapplication.domain
 
-import com.john.kmpapplication.util.ApiResult
-import com.john.kmpapplication.util.handleApi
+import com.john.kmpapplication.data.Product
+import com.john.kmpapplication.data.remote.ApiResult
+import com.john.kmpapplication.data.remote.handleApi
 
 class ProductRepository(
     private val apiService: ApiService

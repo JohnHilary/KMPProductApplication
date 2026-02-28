@@ -1,12 +1,9 @@
-package com.john.kmpapplication.presentation.viewmodel
+package com.john.kmpapplication.ui.product
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.john.kmpapplication.data.ProductRepository
-import com.john.kmpapplication.presentation.event.ProductUiEffect
-import com.john.kmpapplication.presentation.event.ProductUiEvent
-import com.john.kmpapplication.presentation.uistate.ProductUiState
-import com.john.kmpapplication.util.ApiResult
+import com.john.kmpapplication.domain.ProductRepository
+import com.john.kmpapplication.data.remote.ApiResult
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

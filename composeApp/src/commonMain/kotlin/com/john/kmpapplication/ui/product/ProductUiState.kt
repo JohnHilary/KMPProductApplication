@@ -1,4 +1,4 @@
-package com.john.kmpapplication.presentation.uistate
+package com.john.kmpapplication.ui.product
 
 import com.john.kmpapplication.data.Product
 

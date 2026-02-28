@@ -1,4 +1,4 @@
-package com.john.kmpapplication.presentation.ui
+package com.john.kmpapplication.ui.product
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,11 +28,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.john.kmpapplication.data.Product
-import com.john.kmpapplication.presentation.component.FullScreenLoader
-import com.john.kmpapplication.presentation.component.ProductImage
-import com.john.kmpapplication.presentation.event.ProductUiEffect
-import com.john.kmpapplication.presentation.event.ProductUiEvent
-import com.john.kmpapplication.presentation.uistate.ProductUiState
+import com.john.kmpapplication.ui.component.FullScreenLoader
+import com.john.kmpapplication.ui.component.ProductImage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 

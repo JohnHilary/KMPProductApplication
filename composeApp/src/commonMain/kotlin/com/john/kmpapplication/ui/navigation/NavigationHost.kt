@@ -1,4 +1,4 @@
-package com.john.kmpapplication.presentation.navigation
+package com.john.kmpapplication.ui.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -12,8 +12,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.john.kmpapplication.presentation.ui.ProductScreen
-import com.john.kmpapplication.presentation.viewmodel.ProductViewModel
+import com.john.kmpapplication.ui.product.ProductScreen
+import com.john.kmpapplication.ui.product.ProductViewModel
 import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
 

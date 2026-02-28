@@ -1,4 +1,4 @@
-package com.john.kmpapplication.data
+package com.john.kmpapplication.domain
 
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get

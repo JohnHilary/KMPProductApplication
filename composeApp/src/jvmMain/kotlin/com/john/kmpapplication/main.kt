@@ -2,6 +2,7 @@ package com.john.kmpapplication
 
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import com.john.kmpapplication.ui.App
 import com.john.kmpapplication.di.initKoin
 
 fun main() = application {
