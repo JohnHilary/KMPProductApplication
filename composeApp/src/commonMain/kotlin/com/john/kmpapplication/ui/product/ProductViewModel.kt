@@ -69,7 +69,6 @@ class ProductViewModel(
         val categories = listOf("All") + ((categoriesResult as? ApiResult.Success)?.data ?: emptyList())
         _uiState.update { state ->
             state.copy(
-                allProducts = (productsResult as? ApiResult.Success)?.data ?: state.allProducts,
                 products = (productsResult as? ApiResult.Success)?.data ?: state.products,
                 categories = categories
             )
