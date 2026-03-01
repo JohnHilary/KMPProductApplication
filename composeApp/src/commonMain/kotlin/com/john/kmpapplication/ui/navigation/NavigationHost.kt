@@ -12,8 +12,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.john.kmpapplication.ui.product.ProductScreen
-import com.john.kmpapplication.ui.product.ProductViewModel
+import androidx.navigation.toRoute
+import com.john.kmpapplication.ui.product.*
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -42,6 +42,20 @@ fun NavigationHost() {
                     onEvent = {
                         viewModel.onEvent(it)
                     }
+                )
+            }
+
+            composable<ProductDetailScreen> { backStackEntry ->
+                val productDetailScreen = backStackEntry.toRoute<ProductDetailScreen>()
+                val viewModel = koinViewModel<ProductDetailViewModel>()
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                ProductDetailsScreen(
+                    navController = navController,
+                    id = productDetailScreen.productId ?: -1,
+                    uiState = uiState,
+                    uiEffect = viewModel.uiEffect,
+                    snackbarHostState = snackbarHostState,
+                    onEvent = { viewModel.onEvent(it) }
                 )
             }
         }

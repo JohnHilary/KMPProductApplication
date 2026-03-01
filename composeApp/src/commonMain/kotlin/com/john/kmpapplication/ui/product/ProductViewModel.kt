@@ -91,6 +91,12 @@ class ProductViewModel(
                     setLoading(isLoading = false)
                 }
             }
+
+            is ProductUiEvent.NavigateToDetail -> {
+                viewModelScope.launch {
+                    _uiEffect.send(ProductUiEffect.NavigateToDetail(productUiEvent.id))
+                }
+            }
         }
     }
 

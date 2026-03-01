@@ -11,4 +11,6 @@ class ApiService(
 
     suspend fun getCategories() =
         client.get("/products/categories")
+
+    suspend fun getProduct(id: Int?) = client.get("/products/$id")
 }

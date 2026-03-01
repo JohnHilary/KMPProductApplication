@@ -1,13 +1,16 @@
-package com.john.kmpapplication.ui.product
+package com.john.kmpapplication.di
 
 import com.john.kmpapplication.util.Constant
 import com.john.kmpapplication.domain.ApiService
 import com.john.kmpapplication.domain.ProductRepository
+import com.john.kmpapplication.ui.product.ProductDetailViewModel
+import com.john.kmpapplication.ui.product.ProductViewModel
 import io.ktor.client.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val appModule = module {
@@ -23,8 +26,7 @@ val appModule = module {
         }
     }
     single { ApiService(get()) }
-    single { ProductRepository(get()) }
-    single<ProductViewModel> {
-        ProductViewModel(get())
-    }
+    factory { ProductRepository(get()) }
+    viewModel { ProductViewModel(get()) }
+    viewModel { ProductDetailViewModel(get()) }
 }
