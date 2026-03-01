@@ -14,7 +14,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.john.kmpapplication.ui.product.ProductScreen
 import com.john.kmpapplication.ui.product.ProductViewModel
-import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -50,5 +49,3 @@ fun NavigationHost() {
 
 }
 
-@Serializable
-data object ProductScreen

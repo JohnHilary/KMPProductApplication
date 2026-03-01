@@ -37,6 +37,7 @@ import com.john.kmpapplication.ui.component.FullScreenLoader
 import com.john.kmpapplication.ui.component.ProductImage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 
 @Preview
 @Composable
@@ -130,6 +131,8 @@ fun ProductScreen(
     FullScreenLoader(isLoading = uiState.isLoading)
 
 }
+@Serializable
+data object ProductScreen
 
 
 @Composable
