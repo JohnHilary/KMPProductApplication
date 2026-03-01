@@ -49,7 +49,6 @@ fun ProductDetailsScreen(
         }
     }
 
-     print("getProductDetail ${uiState}")
     LaunchedEffect(uiEffect) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             uiEffect?.collect { effect ->

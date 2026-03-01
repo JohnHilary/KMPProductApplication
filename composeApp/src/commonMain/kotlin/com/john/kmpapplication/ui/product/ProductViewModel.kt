@@ -86,8 +86,8 @@ class ProductViewModel(
             is ProductUiEvent.OnFilterItemClicked -> {
                 viewModelScope.launch {
                     setLoading(isLoading = true)
-                    delay(1000)
                     onCategorySelected(category = productUiEvent.item)
+                    delay(1000)
                     setLoading(isLoading = false)
                 }
             }
