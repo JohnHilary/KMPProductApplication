@@ -33,7 +33,7 @@ data class ProductDetailScreen(val productId: Int?)
 @Composable
 fun ProductDetailsScreen(
     navController: NavController = rememberNavController(),
-    id : Int = 0,
+    id: Int = 0,
     uiState: ProductDetailUiState = ProductDetailUiState(),
     uiEffect: Flow<ProductDetailUiEffect>? = null,
     snackbarHostState: SnackbarHostState = SnackbarHostState(),
@@ -73,24 +73,30 @@ fun ProductDetailsScreen(
             bottom = 16.dp
         )
     ) {
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(text = "Product Details", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.height(12.dp))
-        Card(modifier = Modifier.fillMaxWidth()) {
-            ProductImage(
-                imageUrl = uiState.product?.image,
-                modifier = Modifier.size(400.dp).clip(RoundedCornerShape(16.dp))
-                    .align(Alignment.CenterHorizontally).padding(16.dp),
-            )
+        uiState.product?.let { product ->
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = "Product Details", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(12.dp))
+            Card(modifier = Modifier.fillMaxWidth()) {
+                ProductImage(
+                    imageUrl = product.image,
+                    modifier = Modifier.size(400.dp).clip(RoundedCornerShape(16.dp))
+                        .align(Alignment.CenterHorizontally).padding(16.dp),
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = product.title, fontSize = 20.sp)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = product.price.toString(), fontSize = 16.sp)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = product.description)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = product.category ?: "-")
+        } ?: Box(modifier = Modifier.fillMaxSize()) {
+            Text(text = "No Data available", modifier = Modifier.align(Alignment.Center))
         }
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(text = uiState.product?.title ?: "-", fontSize = 20.sp)
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(text = uiState.product?.price.toString(), fontSize = 16.sp)
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(text = uiState.product?.description ?: "-")
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(text = uiState.product?.category ?: "-")
+
     }
     FullScreenLoader(isLoading = uiState.isLoading)
 
