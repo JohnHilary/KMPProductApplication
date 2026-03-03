@@ -33,8 +33,11 @@ class ProductViewModel(
         viewModelScope.launch {
             setLoading(isLoading = true)
             val (productsResult, categoriesResult) = loadData()
-            handleSuccess(productsResult, categoriesResult)
-            handleError(productsResult, categoriesResult)
+            if (productsResult is ApiResult.Success || categoriesResult is ApiResult.Success) {
+                handleSuccess(productsResult, categoriesResult)
+            } else {
+                handleError(productsResult, categoriesResult)
+            }
             setLoading(isLoading = false)
         }
     }
