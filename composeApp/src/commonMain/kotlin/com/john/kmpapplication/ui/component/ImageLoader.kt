@@ -3,13 +3,13 @@ package com.john.kmpapplication.ui.component
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import io.kamel.image.KamelImage
@@ -22,8 +22,8 @@ fun ProductImage(
 ) {
     Box(
         modifier = modifier
-            .size(200.dp)
-            .clip(RoundedCornerShape(16.dp))
+            .size(200.dp),
+        contentAlignment = Alignment.Center
     ) {
         imageUrl?.let {
             KamelImage(
@@ -31,7 +31,7 @@ fun ProductImage(
                     asyncPainterResource(data = imageUrl)
                 },
                 contentDescription = null,
-                modifier = Modifier.matchParentSize().aspectRatio(1f, true),
+                modifier = Modifier.aspectRatio(1f, true).padding(12.dp),
                 contentScale = ContentScale.Fit,
                 onLoading = {
                     CircularProgressIndicator()
