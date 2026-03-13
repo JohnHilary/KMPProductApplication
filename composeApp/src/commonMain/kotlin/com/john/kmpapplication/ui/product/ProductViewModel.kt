@@ -5,15 +5,26 @@ import androidx.lifecycle.viewModelScope
 import com.john.kmpapplication.data.Product
 import com.john.kmpapplication.domain.ProductRepository
 import com.john.kmpapplication.data.remote.ApiResult
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.collections.filter
 
 class ProductViewModel(
     private val repository: ProductRepository
@@ -26,54 +37,73 @@ class ProductViewModel(
     val uiEffect = _uiEffect.receiveAsFlow()
 
     init {
-        initData()
+        loadProducts()
     }
 
-    fun initData() {
-        viewModelScope.launch {
-            setLoading(isLoading = true)
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    private fun loadProducts() {
+        flow {
+            setLoading(true)
             val (productsResult, categoriesResult) = loadData()
-            handleSuccess(productsResult, categoriesResult)
-            handleError(productsResult, categoriesResult)
-            setLoading(isLoading = false)
-        }
-    }
-
-    private suspend fun loadData(): Pair<ApiResult<List<Product>>, ApiResult<List<String>>> =
-        coroutineScope {
-            val productsDeferred = async { getProducts() }
-            val categoriesDeferred = async { getCategories() }
-            productsDeferred.await() to categoriesDeferred.await()
-        }
-
-    private suspend fun handleError(
-        productsResult: ApiResult<*>,
-        categoriesResult: ApiResult<*>
-    ) {
-        val error = listOf(productsResult, categoriesResult)
-            .firstOrNull { it is ApiResult.Error || it is ApiResult.Exception }
-        error?.let {
-            val message = when (it) {
-                is ApiResult.Error -> it.message
-                is ApiResult.Exception -> it.throwable.message ?: "Something went wrong"
-                else -> ""
+            val products = when (productsResult) {
+                is ApiResult.Success -> productsResult.data
+                is ApiResult.Error -> throw Exception(productsResult.message)
+                is ApiResult.Exception -> throw productsResult.throwable
             }
-            _uiEffect.send(ProductUiEffect.ShowSnackbar(message))
-        }
+            val categories = when (categoriesResult) {
+                is ApiResult.Success -> listOf("All") + categoriesResult.data
+                is ApiResult.Error -> throw Exception(categoriesResult.message)
+                is ApiResult.Exception -> throw categoriesResult.throwable
+            }
+            emit(products to categories)
+
+        }.flatMapLatest { (allProducts, categories) ->
+            _uiState.update {
+                it.copy(
+                    allProducts = allProducts,
+                    categories = categories,
+                )
+            }
+            uiState
+                .map { it.selectedCategory }
+                .debounce(300)
+                .distinctUntilChanged()
+                .onEach {
+                    setLoading(true)
+                    delay(300)
+                }
+                .map { category ->
+                    allProducts.filter { product ->
+                        category == null ||
+                                category == "All" ||
+                                product.category == category
+                    }
+                }
+        }.onEach { filteredProducts ->
+                _uiState.update {
+                    it.copy(
+                        products = filteredProducts,
+                        isLoading = false
+                    )
+                }
+            }
+            .catch { e ->
+                setLoading(false)
+                _uiEffect.send(
+                    ProductUiEffect.ShowSnackbar(
+                        e.message ?: "Something went wrong"
+                    )
+                )
+            }
+            .launchIn(viewModelScope)
     }
 
-    private fun handleSuccess(
-        productsResult: ApiResult<List<Product>>,
-        categoriesResult: ApiResult<List<String>>
-    ) {
-        val categories = listOf("All") + ((categoriesResult as? ApiResult.Success)?.data ?: emptyList())
-        _uiState.update { state ->
-            state.copy(
-                products = (productsResult as? ApiResult.Success)?.data ?: state.products,
-                categories = categories
-            )
-        }
+    private suspend fun loadData(): Pair<ApiResult<List<Product>>, ApiResult<List<String>>> = coroutineScope {
+        val productsDeferred = async { getProducts() }
+        val categoriesDeferred = async { getCategories() }
+        productsDeferred.await() to categoriesDeferred.await()
     }
+
 
     private fun setLoading(isLoading: Boolean) {
         _uiState.update {
@@ -83,15 +113,7 @@ class ProductViewModel(
 
     fun onEvent(productUiEvent: ProductUiEvent) {
         when (productUiEvent) {
-            is ProductUiEvent.OnFilterItemClicked -> {
-                viewModelScope.launch {
-                    setLoading(isLoading = true)
-                    onCategorySelected(category = productUiEvent.item)
-                    delay(1000)
-                    setLoading(isLoading = false)
-                }
-            }
-
+            is ProductUiEvent.OnFilterItemClicked -> onCategorySelected(category = productUiEvent.item)
             is ProductUiEvent.NavigateToDetail -> {
                 viewModelScope.launch {
                     _uiEffect.send(ProductUiEffect.NavigateToDetail(productUiEvent.id))

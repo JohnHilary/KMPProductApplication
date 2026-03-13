@@ -54,18 +54,6 @@ fun ProductScreen(
     when {
 
         (uiState.products.isNotEmpty()) -> {
-            val products by remember(
-                uiState.products,
-                uiState.selectedCategory
-            ) {
-                derivedStateOf {
-                    uiState.products.filter { product ->
-                        uiState.selectedCategory == null ||
-                                uiState.selectedCategory == "All" ||
-                                product.category == uiState.selectedCategory
-                    }
-                }
-            }
 
 
             LazyColumn(
@@ -91,7 +79,7 @@ fun ProductScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                 }
                 if (!uiState.isLoading) {
-                    items(products, key = { it.id }) {
+                    items(uiState.products, key = { it.id }) {
                         ProductItem(
                             modifier = Modifier.heightIn(min = 200.dp),
                             product = it,
