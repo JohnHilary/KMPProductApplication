@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.john.kmpapplication.ui.component.FullScreenLoader
@@ -49,50 +49,52 @@ fun ProductDetailsScreen(
     }
 
     LaunchedEffect(uiEffect) {
-        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            uiEffect?.collect { effect ->
-                when (effect) {
-                    ProductDetailUiEffect.NavigateBack -> {
-                        navController.navigateUp()
-                    }
+        uiEffect?.flowWithLifecycle(
+            lifecycleOwner.lifecycle, Lifecycle.State.STARTED
+        )?.collect { effect ->
+            when (effect) {
+                ProductDetailUiEffect.NavigateBack -> {
+                    navController.navigateUp()
+                }
 
-                    is ProductDetailUiEffect.ShowSnackbar -> {
-                        snackbarHostState.showSnackbar(effect.message)
-                    }
+                is ProductDetailUiEffect.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(effect.message)
                 }
             }
         }
+
     }
+    if (uiState.noData) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(text = "No Data available")
 
-    Column(
-        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(
-            top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
-            start = 16.dp,
-            end = 16.dp,
-            bottom = 16.dp
-        )
-    ) {
-        uiState.product?.let { product ->
-
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Product Details", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(12.dp))
-            ProductImage(
-                imageUrl = product.image,
-                modifier = Modifier.fillMaxWidth().background(Color.LightGray)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = product.title, fontSize = 20.sp)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = product.price.toString(), fontSize = 16.sp)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = product.description)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = product.category ?: "-")
-        } ?: Box(modifier = Modifier.fillMaxSize()) {
-            Text(text = "No Data available", modifier = Modifier.align(Alignment.Center))
         }
-
+    } else {
+        Column(
+            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(
+                top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
+                start = 16.dp,
+                end = 16.dp,
+                bottom = 16.dp
+            )
+        ) {
+            uiState.product?.let { product ->
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = "Product Details", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(12.dp))
+                ProductImage(
+                    imageUrl = product.image, modifier = Modifier.fillMaxWidth().background(Color.LightGray)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = product.title, fontSize = 20.sp)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = product.price.toString(), fontSize = 16.sp)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = product.description)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = product.category ?: "-")
+            }
+        }
     }
     FullScreenLoader(isLoading = uiState.isLoading)
 

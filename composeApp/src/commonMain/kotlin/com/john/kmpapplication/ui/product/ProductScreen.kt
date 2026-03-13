@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.john.kmpapplication.data.Product
@@ -39,16 +39,18 @@ fun ProductScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
 
     LaunchedEffect(uiEffect) {
-        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            uiEffect?.collect { effect ->
-                when (effect) {
-                    ProductUiEffect.NavigateBack -> navController.navigateUp()
-                    is ProductUiEffect.ShowSnackbar -> snackbarHostState.showSnackbar(effect.message)
-                    is ProductUiEffect.NavigateToDetail -> navController.navigate(ProductDetailScreen(effect.id))
-                }
+        uiEffect?.flowWithLifecycle(
+            lifecycleOwner.lifecycle,
+            Lifecycle.State.STARTED
+        )?.collect { effect ->
+            when (effect) {
+                ProductUiEffect.NavigateBack -> navController.navigateUp()
+                is ProductUiEffect.ShowSnackbar -> snackbarHostState.showSnackbar(effect.message)
+                is ProductUiEffect.NavigateToDetail -> navController.navigate(ProductDetailScreen(effect.id))
             }
         }
     }
+
     when {
 
         (uiState.products.isNotEmpty()) -> {

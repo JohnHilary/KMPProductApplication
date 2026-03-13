@@ -2,6 +2,7 @@ package com.john.kmpapplication.ui.product
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.john.kmpapplication.data.Product
 import com.john.kmpapplication.data.remote.ApiResult
 import com.john.kmpapplication.domain.ProductRepository
 import kotlinx.coroutines.channels.Channel
@@ -36,10 +37,11 @@ class ProductDetailViewModel(
         viewModelScope.launch {
             setLoading(true)
             when (val result = repository.getProduct(id)) {
-                is ApiResult.Success -> _uiState.update { it.copy(product = result.data, isLoading = false) }
+                is ApiResult.Success -> _uiState.update { it.copy(product = result.data, isLoading = false, noData = result.data as? Product? == null) }
                 is ApiResult.Error -> {
                     _uiEffect.send(ProductDetailUiEffect.ShowSnackbar(message = result.message))
-                    setLoading(false)
+                    _uiState.update { it.copy(noData = true)}
+                        setLoading(false)
                 }
 
                 is ApiResult.Exception -> {
@@ -48,6 +50,7 @@ class ProductDetailViewModel(
                             message = result.throwable.message ?: "Something went wrong"
                         )
                     )
+                    _uiState.update { it.copy(noData = true)}
                     setLoading(false)
                 }
             }
