@@ -41,5 +41,5 @@ val appModule = module {
     single { ApiService(get()) }
     factory { ProductRepository(get()) }
     viewModel { ProductViewModel(get()) }
-    viewModel { ProductDetailViewModel(get()) }
+    viewModel { ProductDetailViewModel(get(),get()) }
 }

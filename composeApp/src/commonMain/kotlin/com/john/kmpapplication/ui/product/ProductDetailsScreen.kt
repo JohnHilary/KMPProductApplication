@@ -6,6 +6,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,7 +37,6 @@ data class ProductDetailScreen(val productId: Int?)
 @Composable
 fun ProductDetailsScreen(
     navController: NavController = rememberNavController(),
-    id: Int = 0,
     uiState: ProductDetailUiState = ProductDetailUiState(),
     uiEffect: Flow<ProductDetailUiEffect>? = null,
     onEvent: (ProductDetailUiEvent) -> Unit = {},
@@ -46,23 +46,20 @@ fun ProductDetailsScreen(
     val snackbarHostState = remember { SnackbarHostState() }
 
 
-    LaunchedEffect(id) {
-        if (uiState.product?.id != id) {
-            onEvent(ProductDetailUiEvent.GetProductDetail(id))
-        }
-    }
-
     LaunchedEffect(uiEffect) {
         uiEffect?.flowWithLifecycle(
             lifecycleOwner.lifecycle, Lifecycle.State.STARTED
         )?.collect { effect ->
             when (effect) {
-                ProductDetailUiEffect.NavigateBack -> {
-                    navController.navigateUp()
-                }
-
+                ProductDetailUiEffect.NavigateBack -> navController.navigateUp()
                 is ProductDetailUiEffect.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(effect.message)
+                    val result = snackbarHostState.showSnackbar(
+                        message = effect.message,
+                        actionLabel = effect.actionLabel
+                    )
+                    if (result == SnackbarResult.ActionPerformed) {
+                        onEvent(ProductDetailUiEvent.GetProductDetail)
+                    }
                 }
             }
         }

@@ -37,12 +37,10 @@ fun NavigationHost() {
         }
 
         composable<ProductDetailScreen> { backStackEntry ->
-            val productDetailScreen = backStackEntry.toRoute<ProductDetailScreen>()
             val viewModel = koinViewModel<ProductDetailViewModel>()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             ProductDetailsScreen(
                 navController = navController,
-                id = productDetailScreen.productId ?: -1,
                 uiState = uiState,
                 uiEffect = viewModel.uiEffect,
                 onEvent = { viewModel.onEvent(it) }
