@@ -1,11 +1,11 @@
 package com.john.kmpapplication.ui.product
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -55,6 +55,7 @@ fun ProductScreen(
             }
         }
     }
+    val searchBarColor = MaterialTheme.colorScheme.secondaryContainer
 
     when {
 
@@ -62,29 +63,32 @@ fun ProductScreen(
             LazyColumn(
                 modifier = modifier, contentPadding = PaddingValues(
                     top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
-                    start = 16.dp,
-                    end = 16.dp,
                     bottom = 16.dp
                 ), verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
 
                 item {
+
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        color = searchBarColor,
+                    ) {
+                        SearchBar(
+                            modifier = Modifier.fillMaxWidth().padding(16.dp).background(MaterialTheme.colorScheme.background, CircleShape),
+                            query ="",
+                            onDismissRequest = {
+                            },
+                            onQueryChange = { query ->
+                            })
+                    }
                     Spacer(modifier = Modifier.height(12.dp))
-                    Text(text = "Products", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold)
+                    Text(modifier = Modifier.padding(horizontal = 16.dp), text = "Products", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold)
                     Spacer(modifier = Modifier.height(16.dp))
-                    SearchBar(
-                        modifier = Modifier.fillMaxWidth(),
-                        query = uiState.searchQuery,
-                        onDismissRequest = {
-                            onEvent(ProductUiEvent.OnSearchQueryChanged(""))
-                            focusManager.clearFocus()
-                        },
-                        onQueryChange = { query ->
-                            onEvent(ProductUiEvent.OnSearchQueryChanged(query))
-                        })
+
                     Spacer(modifier = Modifier.height(12.dp))
                     FilterChips(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                         selectedItem = uiState.selectedCategory ?: uiState.categories[0],
                         items = uiState.categories,
                         onItemSelected = {
@@ -95,7 +99,7 @@ fun ProductScreen(
                 if (!uiState.isLoading) {
                     items(uiState.products, key = { it.id }) {
                         ProductItem(
-                            modifier = Modifier.heightIn(min = 200.dp),
+                            modifier = Modifier.heightIn(min = 200.dp).padding(horizontal = 16.dp),
                             product = it,
                             onClick = {
                                 onEvent(ProductUiEvent.NavigateToDetail(id = it.id))
