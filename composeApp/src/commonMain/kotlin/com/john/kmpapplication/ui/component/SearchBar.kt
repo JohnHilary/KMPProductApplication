@@ -15,6 +15,7 @@ fun SearchBar(
     modifier: Modifier = Modifier,
     query: String,
     placeholder: String = "Search",
+    onDismissRequest: () -> Unit,
     onQueryChange: (String) -> Unit
 ) {
     OutlinedTextField(
@@ -32,7 +33,7 @@ fun SearchBar(
         trailingIcon = {
             if (query.isNotEmpty()) {
                 IconButton(onClick = {
-                    onQueryChange("")
+                    onDismissRequest()
                 }) {
                     Icon(
                         imageVector = Icons.Filled.Close,

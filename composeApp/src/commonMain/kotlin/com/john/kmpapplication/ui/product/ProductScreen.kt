@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,6 +41,7 @@ fun ProductScreen(
 ) {
 
     val lifecycleOwner = LocalLifecycleOwner.current
+    val focusManager = LocalFocusManager.current
 
     LaunchedEffect(uiEffect) {
         uiEffect?.flowWithLifecycle(
@@ -73,6 +75,10 @@ fun ProductScreen(
                     SearchBar(
                         modifier = Modifier.fillMaxWidth(),
                         query = uiState.searchQuery,
+                        onDismissRequest = {
+                            onEvent(ProductUiEvent.OnSearchQueryChanged(""))
+                            focusManager.clearFocus()
+                        },
                         onQueryChange = { query ->
                             onEvent(ProductUiEvent.OnSearchQueryChanged(query))
                         })
