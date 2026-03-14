@@ -43,33 +43,25 @@ class ProductDetailViewModel(
 
     private fun getProduct(id: Int?) {
         viewModelScope.launch {
-            setLoading(true)
-            when (val result = repository.getProduct(id)) {
-                is ApiResult.Success -> _uiState.update {
-                    it.copy(
-                        product = result.data,
-                        isLoading = false,
-                        noData = result.data as? Product? == null
+            try {
+                setLoading(true)
+                when (val result = repository.getProduct(id)) {
+                    is ApiResult.Success -> _uiState.update {
+                        it.copy(product = result.data, isLoading = false, noData = result.data as? Product? == null)
+                    }
+                    is ApiResult.Error -> throw Exception(result.message)
+                    is ApiResult.Exception -> throw result.throwable
+                }
+            } catch (e: Exception) {
+                setLoading(false)
+                _uiEffect.send(
+                    ProductDetailUiEffect.ShowSnackbar(
+                        e.message ?: "Something went wrong",
+                        actionLabel = "Retry"
                     )
-                }
-
-                is ApiResult.Error -> {
-                    _uiEffect.send(ProductDetailUiEffect.ShowSnackbar(message = result.message, actionLabel = "Retry"))
-                    _uiState.update { it.copy(noData = true) }
-                    setLoading(false)
-                }
-
-                is ApiResult.Exception -> {
-                    _uiEffect.send(
-                        ProductDetailUiEffect.ShowSnackbar(
-                            message = result.throwable.message ?: "Something went wrong", actionLabel = "Retry"
-                        )
-                    )
-                    _uiState.update { it.copy(noData = true) }
-                    setLoading(false)
-                }
+                )
             }
+
         }
     }
-
 }
