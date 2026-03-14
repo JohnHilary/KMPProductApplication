@@ -111,8 +111,6 @@ fun ProductScreen(
                             fontSize = 24.sp,
                             fontWeight = FontWeight.ExtraBold
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
-
                         Spacer(modifier = Modifier.height(12.dp))
                         FilterChips(
                             modifier = Modifier.fillMaxWidth(),
