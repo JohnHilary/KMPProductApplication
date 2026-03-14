@@ -54,7 +54,7 @@ class ProductDetailViewModel(
                 }
 
                 is ApiResult.Error -> {
-                    _uiEffect.send(ProductDetailUiEffect.ShowSnackbar(message = result.message))
+                    _uiEffect.send(ProductDetailUiEffect.ShowSnackbar(message = result.message, actionLabel = "Retry"))
                     _uiState.update { it.copy(noData = true) }
                     setLoading(false)
                 }
@@ -62,7 +62,7 @@ class ProductDetailViewModel(
                 is ApiResult.Exception -> {
                     _uiEffect.send(
                         ProductDetailUiEffect.ShowSnackbar(
-                            message = result.throwable.message ?: "Something went wrong"
+                            message = result.throwable.message ?: "Something went wrong", actionLabel = "Retry"
                         )
                     )
                     _uiState.update { it.copy(noData = true) }
