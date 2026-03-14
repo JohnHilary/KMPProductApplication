@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
@@ -26,9 +28,11 @@ import com.john.kmpapplication.ui.component.FilterChips
 import com.john.kmpapplication.ui.component.FullScreenLoader
 import com.john.kmpapplication.ui.component.ProductImage
 import com.john.kmpapplication.ui.component.SearchBar
+import com.john.kmpapplication.ui.component.TopBarHostState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun ProductScreen(
@@ -37,13 +41,51 @@ fun ProductScreen(
     uiState: ProductUiState = ProductUiState(),
     uiEffect: Flow<ProductUiEffect>? = null,
     snackbarHostState: SnackbarHostState = SnackbarHostState(),
+    topBarHostState: TopBarHostState = TopBarHostState(),
     onEvent: (ProductUiEvent) -> Unit = {}
 ) {
 
     val lifecycleOwner = LocalLifecycleOwner.current
     val focusManager = LocalFocusManager.current
     val searchBarColor = MaterialTheme.colorScheme.secondaryContainer
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
+
+    val myColors = TopAppBarDefaults.topAppBarColors(
+        containerColor = searchBarColor,
+        scrolledContainerColor = searchBarColor
+    )
+
+    LaunchedEffect(Unit) {
+        topBarHostState.update(
+            behavior = scrollBehavior,
+            colors = myColors
+        ) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                color = searchBarColor,
+            ) {
+                SearchBar(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp)
+                        .background(MaterialTheme.colorScheme.background, CircleShape),
+                    query = uiState.searchQuery,
+                    onDismissRequest = {
+                        onEvent(ProductUiEvent.OnSearchQueryChanged(""))
+                        focusManager.clearFocus()
+                    },
+                    onQueryChange = { query ->
+                        onEvent(ProductUiEvent.OnSearchQueryChanged(query))
+                    })
+            }
+        }
+    }
+
+    LifecycleResumeEffect(Unit) {
+        onPauseOrDispose {
+        topBarHostState.reset()
+        }
+    }
 
     LaunchedEffect(uiEffect) {
         uiEffect?.flowWithLifecycle(
@@ -63,30 +105,11 @@ fun ProductScreen(
         (uiState.allProducts.isNotEmpty()) -> {
             LazyColumn(
                 modifier = modifier, contentPadding = PaddingValues(
-                    top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
                     bottom = 16.dp
                 ), verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
 
                 item {
-
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        color = searchBarColor,
-                    ) {
-                        SearchBar(
-                            modifier = Modifier.fillMaxWidth().padding(16.dp)
-                                .background(MaterialTheme.colorScheme.background, CircleShape),
-                            query = uiState.searchQuery,
-                            onDismissRequest = {
-                                onEvent(ProductUiEvent.OnSearchQueryChanged(""))
-                                focusManager.clearFocus()
-                            },
-                            onQueryChange = { query ->
-                                onEvent(ProductUiEvent.OnSearchQueryChanged(query))
-                            })
-                    }
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
                         modifier = Modifier.padding(horizontal = 16.dp),
