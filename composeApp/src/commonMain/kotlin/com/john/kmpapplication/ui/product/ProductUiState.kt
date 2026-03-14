@@ -7,5 +7,6 @@ data class ProductUiState(
     val allProducts: List<Product> = emptyList(),
     val products: List<Product> = emptyList(),
     val categories: List<String> = emptyList(),
-    val selectedCategory: String? = null
+    val selectedCategory: String? = null,
+    val searchQuery: String = ""
 )

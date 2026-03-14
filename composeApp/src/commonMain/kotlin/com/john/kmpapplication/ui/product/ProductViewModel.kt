@@ -5,7 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.john.kmpapplication.data.Product
 import com.john.kmpapplication.domain.ProductRepository
 import com.john.kmpapplication.data.remote.ApiResult
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.john.kmpapplication.ui.product.ProductUiEffect.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
@@ -13,11 +14,11 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -37,65 +38,79 @@ class ProductViewModel(
     val uiEffect = _uiEffect.receiveAsFlow()
 
     init {
-        loadProducts()
+        initData()
     }
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    private fun loadProducts() {
-        flow {
-            setLoading(true)
-            val (productsResult, categoriesResult) = loadData()
-            val products = when (productsResult) {
-                is ApiResult.Success -> productsResult.data
-                is ApiResult.Error -> throw Exception(productsResult.message)
-                is ApiResult.Exception -> throw productsResult.throwable
-            }
-            val categories = when (categoriesResult) {
-                is ApiResult.Success -> listOf("All") + categoriesResult.data
-                is ApiResult.Error -> throw Exception(categoriesResult.message)
-                is ApiResult.Exception -> throw categoriesResult.throwable
-            }
-            emit(products to categories)
+    private fun initData() {
+        viewModelScope.launch {
+            try {
+                setLoading(true)
 
-        }.flatMapLatest { (allProducts, categories) ->
-            _uiState.update {
-                it.copy(
-                    allProducts = allProducts,
-                    categories = categories,
-                )
-            }
-            uiState
-                .map { it.selectedCategory }
-                .debounce(300)
-                .distinctUntilChanged()
-                .onEach {
-                    setLoading(true)
-                    delay(300)
+                val (productsResult, categoriesResult) = loadData()
+
+                val products = when (productsResult) {
+                    is ApiResult.Success -> productsResult.data
+                    is ApiResult.Error -> throw Exception(productsResult.message)
+                    is ApiResult.Exception -> throw productsResult.throwable
                 }
-                .map { category ->
-                    allProducts.filter { product ->
-                        category == null ||
-                                category == "All" ||
-                                product.category == category
-                    }
+
+                val categories = when (categoriesResult) {
+                    is ApiResult.Success -> listOf("All") + categoriesResult.data
+                    is ApiResult.Error -> throw Exception(categoriesResult.message)
+                    is ApiResult.Exception -> throw categoriesResult.throwable
                 }
-        }.onEach { filteredProducts ->
+
                 _uiState.update {
                     it.copy(
-                        products = filteredProducts,
-                        isLoading = false
+                        allProducts = products,
+                        products = products,
+                        categories = categories,
                     )
                 }
-            }
-            .catch { e ->
+                setLoading(false)
+                observeFilters()
+
+            } catch (e: Exception) {
                 setLoading(false)
                 _uiEffect.send(
-                    ProductUiEffect.ShowSnackbar(
+                    ShowSnackbar(
                         e.message ?: "Something went wrong"
                     )
                 )
             }
-            .launchIn(viewModelScope)
+        }
+    }
+
+    @OptIn(FlowPreview::class)
+    private fun observeFilters() {
+        combine(
+            uiState.map { it.selectedCategory }.distinctUntilChanged(),
+            uiState.map { it.searchQuery }.debounce(300).distinctUntilChanged(),
+            uiState.map { it.allProducts }.distinctUntilChanged()
+        )
+        { category, query, products ->
+
+            products.filter { product ->
+
+                val categoryMatch =
+                    category == null || category == "All" || product.category == category
+
+                val searchMatch =
+                    query.isBlank() || product.title.contains(query, true)
+
+                categoryMatch && searchMatch
+            }
+        }.flowOn(Dispatchers.Default).drop(1).onEach {
+            setLoading(true)
+        }.map { filteredProducts ->
+            delay(300)
+            filteredProducts
+        }.onEach { filteredProducts ->
+            _uiState.update {
+                it.copy(products = filteredProducts)
+            }
+            setLoading(false)
+        }.launchIn(viewModelScope)
     }
 
     private suspend fun loadData(): Pair<ApiResult<List<Product>>, ApiResult<List<String>>> = coroutineScope {
@@ -116,15 +131,23 @@ class ProductViewModel(
             is ProductUiEvent.OnFilterItemClicked -> onCategorySelected(category = productUiEvent.item)
             is ProductUiEvent.NavigateToDetail -> {
                 viewModelScope.launch {
-                    _uiEffect.send(ProductUiEffect.NavigateToDetail(productUiEvent.id))
+                    _uiEffect.send(NavigateToDetail(productUiEvent.id))
                 }
             }
+
+            is ProductUiEvent.OnSearchQueryChanged -> onSearchQuery(query = productUiEvent.query)
         }
     }
 
     private fun onCategorySelected(category: String) {
         _uiState.update {
             it.copy(selectedCategory = category)
+        }
+    }
+
+    private fun onSearchQuery(query: String) {
+        _uiState.update {
+            it.copy(searchQuery = query)
         }
     }
 

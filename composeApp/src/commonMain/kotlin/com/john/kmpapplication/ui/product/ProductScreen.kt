@@ -6,9 +6,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -22,6 +24,7 @@ import com.john.kmpapplication.data.Product
 import com.john.kmpapplication.ui.component.FilterChips
 import com.john.kmpapplication.ui.component.FullScreenLoader
 import com.john.kmpapplication.ui.component.ProductImage
+import com.john.kmpapplication.ui.component.SearchBar
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 
@@ -53,9 +56,7 @@ fun ProductScreen(
 
     when {
 
-        (uiState.products.isNotEmpty()) -> {
-
-
+        (uiState.allProducts.isNotEmpty()) -> {
             LazyColumn(
                 modifier = modifier, contentPadding = PaddingValues(
                     top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
@@ -66,9 +67,16 @@ fun ProductScreen(
             ) {
 
                 item {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = "Products", fontSize = 20.sp)
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(text = "Products", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    SearchBar(
+                        modifier = Modifier.fillMaxWidth(),
+                        query = uiState.searchQuery,
+                        onQueryChange = { query ->
+                            onEvent(ProductUiEvent.OnSearchQueryChanged(query))
+                        })
+                    Spacer(modifier = Modifier.height(12.dp))
                     FilterChips(
                         modifier = Modifier.fillMaxWidth(),
                         selectedItem = uiState.selectedCategory ?: uiState.categories[0],
@@ -84,14 +92,25 @@ fun ProductScreen(
                             modifier = Modifier.heightIn(min = 200.dp),
                             product = it,
                             onClick = {
-                                 onEvent(ProductUiEvent.NavigateToDetail(id = it.id))
+                                onEvent(ProductUiEvent.NavigateToDetail(id = it.id))
                             })
+                    }
+                }
+                if (!uiState.isLoading && uiState.products.isEmpty()) {
+                    item {
+                        Box(
+                            modifier = Modifier.fillParentMaxSize(), contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "No result found"
+                            )
+                        }
                     }
                 }
             }
         }
 
-        (!uiState.isLoading && uiState.products.isEmpty()) -> {
+        (!uiState.isLoading && uiState.allProducts.isEmpty()) -> {
             Box(modifier = Modifier.fillMaxSize()) {
                 Text(text = "No products available", modifier = Modifier.align(Alignment.Center))
             }
