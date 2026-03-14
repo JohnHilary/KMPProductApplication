@@ -4,10 +4,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,6 +22,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.john.kmpapplication.ui.BaseScreen
 import com.john.kmpapplication.ui.component.FullScreenLoader
 import com.john.kmpapplication.ui.component.ProductImage
 import kotlinx.coroutines.flow.Flow
@@ -28,6 +31,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ProductDetailScreen(val productId: Int?)
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun ProductDetailsScreen(
@@ -35,11 +39,11 @@ fun ProductDetailsScreen(
     id: Int = 0,
     uiState: ProductDetailUiState = ProductDetailUiState(),
     uiEffect: Flow<ProductDetailUiEffect>? = null,
-    snackbarHostState: SnackbarHostState = SnackbarHostState(),
     onEvent: (ProductDetailUiEvent) -> Unit = {},
 ) {
 
     val lifecycleOwner = LocalLifecycleOwner.current
+    val snackbarHostState = remember { SnackbarHostState() }
 
 
     LaunchedEffect(id) {
@@ -64,39 +68,41 @@ fun ProductDetailsScreen(
         }
 
     }
-    if (uiState.noData) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(text = "No Data available")
 
-        }
-    } else {
-        Column(
-            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(
-                top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
-                start = 16.dp,
-                end = 16.dp,
-                bottom = 16.dp
-            )
-        ) {
-            uiState.product?.let { product ->
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = "Product Details", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.height(12.dp))
-                ProductImage(
-                    imageUrl = product.image, modifier = Modifier.fillMaxWidth().background(Color.LightGray)
+    BaseScreen(snackbarHostState = snackbarHostState) {
+        if (uiState.noData) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(text = "No Data available")
+
+            }
+        } else {
+            Column(
+                modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(
+                    top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
+                    start = 16.dp,
+                    end = 16.dp,
+                    bottom = 16.dp
                 )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = product.title, fontSize = 20.sp)
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = product.price.toString(), fontSize = 16.sp)
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = product.description)
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = product.category ?: "-")
+            ) {
+                uiState.product?.let { product ->
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = "Product Details", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(12.dp))
+                    ProductImage(
+                        imageUrl = product.image, modifier = Modifier.fillMaxWidth().background(Color.LightGray)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = product.title, fontSize = 20.sp)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = product.price.toString(), fontSize = 16.sp)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = product.description)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = product.category ?: "-")
+                }
             }
         }
+        FullScreenLoader(isLoading = uiState.isLoading)
     }
-    FullScreenLoader(isLoading = uiState.isLoading)
-
 
 }

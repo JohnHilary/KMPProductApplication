@@ -7,8 +7,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
@@ -18,17 +18,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.john.kmpapplication.data.Product
+import com.john.kmpapplication.ui.BaseScreen
 import com.john.kmpapplication.ui.component.FilterChips
 import com.john.kmpapplication.ui.component.FullScreenLoader
 import com.john.kmpapplication.ui.component.ProductImage
 import com.john.kmpapplication.ui.component.SearchBar
-import com.john.kmpapplication.ui.component.TopBarHostState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 
@@ -40,8 +39,6 @@ fun ProductScreen(
     navController: NavController = rememberNavController(),
     uiState: ProductUiState = ProductUiState(),
     uiEffect: Flow<ProductUiEffect>? = null,
-    snackbarHostState: SnackbarHostState = SnackbarHostState(),
-    topBarHostState: TopBarHostState = TopBarHostState(),
     onEvent: (ProductUiEvent) -> Unit = {}
 ) {
 
@@ -49,43 +46,9 @@ fun ProductScreen(
     val focusManager = LocalFocusManager.current
     val searchBarColor = MaterialTheme.colorScheme.secondaryContainer
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val snackbarHostState = remember { SnackbarHostState() }
 
 
-    val myColors = TopAppBarDefaults.topAppBarColors(
-        containerColor = searchBarColor,
-        scrolledContainerColor = searchBarColor
-    )
-
-    LaunchedEffect(Unit) {
-        topBarHostState.update(
-            behavior = scrollBehavior,
-            colors = myColors
-        ) {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                color = searchBarColor,
-            ) {
-                SearchBar(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp)
-                        .background(MaterialTheme.colorScheme.background, CircleShape),
-                    query = uiState.searchQuery,
-                    onDismissRequest = {
-                        onEvent(ProductUiEvent.OnSearchQueryChanged(""))
-                        focusManager.clearFocus()
-                    },
-                    onQueryChange = { query ->
-                        onEvent(ProductUiEvent.OnSearchQueryChanged(query))
-                    })
-            }
-        }
-    }
-
-    LifecycleResumeEffect(Unit) {
-        onPauseOrDispose {
-        topBarHostState.reset()
-        }
-    }
 
     LaunchedEffect(uiEffect) {
         uiEffect?.flowWithLifecycle(
@@ -100,69 +63,97 @@ fun ProductScreen(
         }
     }
 
-    when {
-
-        (uiState.allProducts.isNotEmpty()) -> {
-            LazyColumn(
-                modifier = modifier, contentPadding = PaddingValues(
-                    bottom = 16.dp
-                ), verticalArrangement = Arrangement.spacedBy(12.dp)
+    BaseScreen(
+        title = {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth().padding(end = 16.dp, top = 16.dp, bottom = 16.dp),
+                color = searchBarColor,
             ) {
+                SearchBar(
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.background, CircleShape).fillMaxWidth(),
+                    query = uiState.searchQuery,
+                    onDismissRequest = {
+                        onEvent(ProductUiEvent.OnSearchQueryChanged(""))
+                        focusManager.clearFocus()
+                    },
+                    onQueryChange = { query ->
+                        onEvent(ProductUiEvent.OnSearchQueryChanged(query))
+                    })
+            }
 
-                item {
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        text = "Products",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.ExtraBold
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
+        },
+        snackbarHostState = snackbarHostState, scrollBehavior = scrollBehavior,
+    ) {
 
-                    Spacer(modifier = Modifier.height(12.dp))
-                    FilterChips(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                        selectedItem = uiState.selectedCategory ?: uiState.categories[0],
-                        items = uiState.categories,
-                        onItemSelected = {
-                            onEvent(ProductUiEvent.OnFilterItemClicked(item = it))
-                        })
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-                if (!uiState.isLoading) {
-                    items(uiState.products, key = { it.id }) {
-                        ProductItem(
-                            modifier = Modifier.heightIn(min = 200.dp).padding(horizontal = 16.dp),
-                            product = it,
-                            onClick = {
-                                onEvent(ProductUiEvent.NavigateToDetail(id = it.id))
-                            })
-                    }
-                }
-                if (!uiState.isLoading && uiState.products.isEmpty()) {
+        when {
+
+            (uiState.allProducts.isNotEmpty()) -> {
+                LazyColumn(
+                    modifier = modifier,
+                    contentPadding = PaddingValues(
+                        top = it.calculateTopPadding(),
+                        bottom = (it.calculateBottomPadding() + 16.dp),
+                        start = 16.dp,
+                        end = 16.dp
+                    ),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+
                     item {
-                        Box(
-                            modifier = Modifier.fillParentMaxSize(), contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "No result found"
-                            )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = "Products",
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Spacer(modifier = Modifier.height(12.dp))
+                        FilterChips(
+                            modifier = Modifier.fillMaxWidth(),
+                            selectedItem = uiState.selectedCategory ?: uiState.categories[0],
+                            items = uiState.categories,
+                            onItemSelected = {
+                                onEvent(ProductUiEvent.OnFilterItemClicked(item = it))
+                            })
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                    if (!uiState.isLoading) {
+                        items(uiState.products, key = { it.id }) {
+                            ProductItem(
+                                modifier = Modifier.heightIn(min = 200.dp),
+                                product = it,
+                                onClick = {
+                                    onEvent(ProductUiEvent.NavigateToDetail(id = it.id))
+                                })
+                        }
+                    }
+                    if (!uiState.isLoading && uiState.products.isEmpty()) {
+                        item {
+                            Box(
+                                modifier = Modifier.fillParentMaxSize(), contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "No result found"
+                                )
+                            }
                         }
                     }
                 }
             }
-        }
 
-        (!uiState.isLoading && uiState.allProducts.isEmpty()) -> {
-            Box(modifier = Modifier.fillMaxSize()) {
-                Text(text = "No products available", modifier = Modifier.align(Alignment.Center))
+            (!uiState.isLoading && uiState.allProducts.isEmpty()) -> {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Text(text = "No products available", modifier = Modifier.align(Alignment.Center))
+                }
             }
+
         }
 
+        FullScreenLoader(isLoading = uiState.isLoading)
     }
-
-    FullScreenLoader(isLoading = uiState.isLoading)
-
 }
 
 @Serializable
