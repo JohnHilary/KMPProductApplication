@@ -74,7 +74,8 @@ class ProductViewModel(
                 setLoading(false)
                 _uiEffect.send(
                     ShowSnackbar(
-                        e.message ?: "Something went wrong"
+                        e.message ?: "Something went wrong",
+                        actionLabel = "Retry"
                     )
                 )
             }
@@ -136,6 +137,8 @@ class ProductViewModel(
             }
 
             is ProductUiEvent.OnSearchQueryChanged -> onSearchQuery(query = productUiEvent.query)
+            ProductUiEvent.LoadData -> initData()
+
         }
     }
 

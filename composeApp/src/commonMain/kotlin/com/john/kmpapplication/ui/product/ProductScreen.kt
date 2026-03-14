@@ -43,7 +43,6 @@ fun ProductScreen(
 ) {
 
     val lifecycleOwner = LocalLifecycleOwner.current
-    val focusManager = LocalFocusManager.current
     val searchBarColor = MaterialTheme.colorScheme.secondaryContainer
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -57,7 +56,15 @@ fun ProductScreen(
         )?.collect { effect ->
             when (effect) {
                 ProductUiEffect.NavigateBack -> navController.navigateUp()
-                is ProductUiEffect.ShowSnackbar -> snackbarHostState.showSnackbar(effect.message)
+                is ProductUiEffect.ShowSnackbar -> {
+                    val result = snackbarHostState.showSnackbar(
+                        message = effect.message,
+                        actionLabel = effect.actionLabel
+                    )
+                    if (result == SnackbarResult.ActionPerformed) {
+                        onEvent(ProductUiEvent.LoadData)
+                    }
+                }
                 is ProductUiEffect.NavigateToDetail -> navController.navigate(ProductDetailScreen(effect.id))
             }
         }
@@ -74,10 +81,6 @@ fun ProductScreen(
                     modifier = Modifier
                         .background(MaterialTheme.colorScheme.background, CircleShape).fillMaxWidth(),
                     query = uiState.searchQuery,
-                    onDismissRequest = {
-                        onEvent(ProductUiEvent.OnSearchQueryChanged(""))
-                        focusManager.clearFocus()
-                    },
                     onQueryChange = { query ->
                         onEvent(ProductUiEvent.OnSearchQueryChanged(query))
                     })
