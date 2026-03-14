@@ -42,6 +42,8 @@ fun ProductScreen(
 
     val lifecycleOwner = LocalLifecycleOwner.current
     val focusManager = LocalFocusManager.current
+    val searchBarColor = MaterialTheme.colorScheme.secondaryContainer
+
 
     LaunchedEffect(uiEffect) {
         uiEffect?.flowWithLifecycle(
@@ -55,7 +57,6 @@ fun ProductScreen(
             }
         }
     }
-    val searchBarColor = MaterialTheme.colorScheme.secondaryContainer
 
     when {
 
@@ -75,15 +76,24 @@ fun ProductScreen(
                         color = searchBarColor,
                     ) {
                         SearchBar(
-                            modifier = Modifier.fillMaxWidth().padding(16.dp).background(MaterialTheme.colorScheme.background, CircleShape),
-                            query ="",
+                            modifier = Modifier.fillMaxWidth().padding(16.dp)
+                                .background(MaterialTheme.colorScheme.background, CircleShape),
+                            query = uiState.searchQuery,
                             onDismissRequest = {
+                                onEvent(ProductUiEvent.OnSearchQueryChanged(""))
+                                focusManager.clearFocus()
                             },
                             onQueryChange = { query ->
+                                onEvent(ProductUiEvent.OnSearchQueryChanged(query))
                             })
                     }
                     Spacer(modifier = Modifier.height(12.dp))
-                    Text(modifier = Modifier.padding(horizontal = 16.dp), text = "Products", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold)
+                    Text(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        text = "Products",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.ExtraBold
+                    )
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -131,6 +141,7 @@ fun ProductScreen(
     FullScreenLoader(isLoading = uiState.isLoading)
 
 }
+
 @Serializable
 data object ProductScreen
 
