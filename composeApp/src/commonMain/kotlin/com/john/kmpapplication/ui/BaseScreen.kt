@@ -19,6 +19,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 fun BaseScreen(
     title: (@Composable () -> Unit)? = null,
     navigationIcon: (@Composable () -> Unit)? = null,
+    actions: (@Composable () -> Unit)? = null,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     scrollBehavior: TopAppBarScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(),
     topBarColors: TopAppBarColors? = null,
@@ -46,6 +47,9 @@ fun BaseScreen(
                         ),
                         navigationIcon = {
                             navigationIcon?.invoke()
+                        },
+                        actions = {
+                            actions?.invoke()
                         }
                     )
                 }

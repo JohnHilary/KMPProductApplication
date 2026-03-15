@@ -24,7 +24,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.john.kmpapplication.ui.BaseScreen
 import com.john.kmpapplication.ui.component.FullScreenLoader
-import com.john.kmpapplication.ui.component.ProductImage
+import com.john.kmpapplication.ui.component.AppImage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 
@@ -94,7 +94,7 @@ fun ProductDetailsScreen(
             ) {
                 uiState.product?.let { product ->
                     Spacer(modifier = Modifier.height(12.dp))
-                    ProductImage(
+                    AppImage(
                         imageUrl = product.image, modifier = Modifier.fillMaxWidth().background(Color.LightGray)
                     )
                     Spacer(modifier = Modifier.height(8.dp))

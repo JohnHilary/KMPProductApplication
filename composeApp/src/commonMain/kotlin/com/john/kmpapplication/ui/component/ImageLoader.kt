@@ -1,29 +1,44 @@
 package com.john.kmpapplication.ui.component
 
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
 
 @Composable
-fun ProductImage(
-    imageUrl: String?,
+fun AppImage(
     modifier: Modifier = Modifier,
+    imageUrl: String?,
+    defaultIcon: ImageVector? = null,
+    size: Dp = 200.dp,
+    shape: Shape = RoundedCornerShape(16.dp),
+    shadowElevation: Dp = 0.dp,
+    backgroundColor: Color = Color.Transparent,
 ) {
-    Box(
+    Surface(
         modifier = modifier
-            .size(200.dp),
-        contentAlignment = Alignment.Center
+            .size(size)
+            .padding(4.dp),
+        shape = shape,
+        shadowElevation = shadowElevation,
+        color = backgroundColor
     ) {
         imageUrl?.let {
             KamelImage(
@@ -31,13 +46,27 @@ fun ProductImage(
                     asyncPainterResource(data = imageUrl)
                 },
                 contentDescription = null,
-                modifier = Modifier.aspectRatio(1f, true).padding(12.dp),
-                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(shape),
+                contentScale = if (shape == CircleShape) ContentScale.Crop else ContentScale.Fit,
                 onLoading = {
                     CircularProgressIndicator()
                 },
-                onFailure = { exception ->
-                    Text(text = "Failed to load image, $exception")
+                onFailure = { _ ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(shape).padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            imageVector = defaultIcon ?: Icons.Default.ShoppingBag,
+                            contentDescription = null,
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
                 },
                 animationSpec = tween(durationMillis = 300)
             )

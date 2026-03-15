@@ -27,7 +27,7 @@ import com.john.kmpapplication.data.Product
 import com.john.kmpapplication.ui.BaseScreen
 import com.john.kmpapplication.ui.component.FilterChips
 import com.john.kmpapplication.ui.component.FullScreenLoader
-import com.john.kmpapplication.ui.component.ProductImage
+import com.john.kmpapplication.ui.component.AppImage
 import com.john.kmpapplication.ui.component.SearchBar
 import com.john.kmpapplication.ui.navigation.AnimatedBottomBar
 import kotlinx.coroutines.flow.Flow
@@ -169,7 +169,7 @@ data object ProductScreen
 fun ProductItem(modifier: Modifier = Modifier, product: Product, onClick: () -> Unit = {}) {
     Card(modifier = modifier, onClick = { onClick() }) {
         Column(modifier = Modifier.padding(16.dp)) {
-            ProductImage(
+            AppImage(
                 imageUrl = product.image, modifier = Modifier.align(Alignment.CenterHorizontally)
             )
             Spacer(modifier = Modifier.height(8.dp))
