@@ -10,11 +10,12 @@ import androidx.compose.ui.graphics.Color
 
 @Composable
 fun FullScreenLoader(
+    modifier: Modifier = Modifier,
     isLoading: Boolean
 ) {
     if (isLoading) {
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {

@@ -9,11 +9,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.john.kmpapplication.data.User
+import com.john.kmpapplication.ui.login.LoginScreen
+import com.john.kmpapplication.ui.login.LoginViewModel
 import com.john.kmpapplication.ui.product.*
 import com.john.kmpapplication.ui.profile.MyProfile
 import com.john.kmpapplication.ui.profile.MyProfileScreen
-import com.john.kmpapplication.ui.profile.ProfileUiState
+import com.john.kmpapplication.ui.profile.ProfileViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,7 +40,7 @@ fun NavigationHost() {
             )
         }
 
-        composable<ProductDetailScreen> { backStackEntry ->
+        composable<ProductDetailScreen> { _ ->
             val viewModel = koinViewModel<ProductDetailViewModel>()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             ProductDetailsScreen(
@@ -51,10 +52,26 @@ fun NavigationHost() {
         }
 
         composable<MyProfile> {
+            val viewModel = koinViewModel<ProfileViewModel>()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             MyProfileScreen(
                 navController = navController,
-                uiState = ProfileUiState(user = User(email = "Test@gmail.com", password = "test123", username = "Test"))
+                uiState = uiState,
+                uiEffect = viewModel.uiEffect
             )
+        }
+
+        composable<LoginScreen> {
+            val viewModel = koinViewModel<LoginViewModel>()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            LoginScreen(
+                navController = navController,
+                uiState = uiState,
+                uiEffect = viewModel.uiEffect,
+            ) {
+                viewModel.onEvent(it)
+            }
+
         }
     }
 }

@@ -15,7 +15,7 @@ composeMultiplatform = "1.10.0"
 junit = "4.13.2"
 kamelImageDefault = "1.0.9"
 koinCore = "4.1.1"
-kotlin = "2.3.0"
+kotlin = "2.3.10"
 kotlinx-coroutines = "1.10.2"
 kotlinxSerializationJson = "1.10.0"
 ktor = "3.3.3"
@@ -25,6 +25,9 @@ logback = "1.5.24"
 material3 = "1.10.0-alpha05"
 lifecycleViewModel = "2.10.0"
 navigationCompose = "2.9.2"
+room = "2.8.4"
+ksp = "2.2.20-2.0.4"
+sqlite = "2.6.2"
 
 
 [libraries]
@@ -67,6 +70,9 @@ ktor-serverTestHost = { module = "io.ktor:ktor-server-test-host-jvm", version.re
 navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycleViewModel"}
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koinCore" }
+androidx-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room"}
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -77,3 +83,5 @@ composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "k
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+androidx-room = { id = "androidx.room", version.ref = "room" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

@@ -1,5 +1,9 @@
 package com.john.kmpapplication.ui.profile
 
-import com.john.kmpapplication.data.User
+import com.john.kmpapplication.db.UserEntity
 
-data class ProfileUiState(val isLoading: Boolean = false, val user: User? = null, val isLoggedIn: Boolean = false)
+data class ProfileUiState(
+    val isLoading: Boolean = false,
+    val userEntity: UserEntity? = null,
+    val isLoggedIn: Boolean = false
+)
