@@ -9,8 +9,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
 import com.john.kmpapplication.ui.product.*
+import com.john.kmpapplication.ui.profile.MyProfile
+import com.john.kmpapplication.ui.profile.MyProfileScreen
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,6 +46,10 @@ fun NavigationHost() {
                 uiEffect = viewModel.uiEffect,
                 onEvent = { viewModel.onEvent(it) }
             )
+        }
+
+        composable<MyProfile> {
+            MyProfileScreen(navController = navController)
         }
     }
 }

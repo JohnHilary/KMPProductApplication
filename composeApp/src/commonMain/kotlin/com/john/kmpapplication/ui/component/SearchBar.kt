@@ -41,6 +41,7 @@ fun SearchBar(
             if (query.isNotEmpty()) {
                 IconButton(onClick = {
                     onQueryChange("")
+                    focusManager.clearFocus()
                 }) {
                     Icon(
                         imageVector = Icons.Filled.Close,

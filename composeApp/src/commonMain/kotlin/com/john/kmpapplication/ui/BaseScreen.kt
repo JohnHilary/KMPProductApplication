@@ -15,10 +15,12 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 @Composable
 fun BaseScreen(
     title: (@Composable () -> Unit)? = null,
+    navigationIcon: (@Composable () -> Unit)? = null,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     scrollBehavior: TopAppBarScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(),
     topBarColors: TopAppBarColors? = null,
     floatingActionButton: @Composable () -> Unit = {},
+    bottomBar: @Composable () -> Unit = {},
     content: @Composable (PaddingValues) -> Unit
 ) {
     val scrollConnection = scrollBehavior.nestedScrollConnection
@@ -38,13 +40,17 @@ fun BaseScreen(
                         colors = topBarColors ?: TopAppBarDefaults.topAppBarColors(
                             containerColor = MaterialTheme.colorScheme.primaryContainer,
                             scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer
-                        )
+                        ),
+                        navigationIcon = {
+                            navigationIcon?.invoke()
+                        }
                     )
                 }
             }
 
         },
-        floatingActionButton = floatingActionButton
+        floatingActionButton = floatingActionButton,
+        bottomBar = bottomBar,
     ) { innerPadding ->
         content(innerPadding)
     }

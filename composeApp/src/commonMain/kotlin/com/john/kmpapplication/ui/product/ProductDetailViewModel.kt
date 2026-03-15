@@ -49,7 +49,6 @@ class ProductDetailViewModel(
                     is ApiResult.Success -> _uiState.update {
                         it.copy(product = result.data, isLoading = false, noData = result.data as? Product? == null)
                     }
-
                     is ApiResult.Error -> throw Exception(result.message)
                     is ApiResult.Exception -> throw result.throwable
                 }

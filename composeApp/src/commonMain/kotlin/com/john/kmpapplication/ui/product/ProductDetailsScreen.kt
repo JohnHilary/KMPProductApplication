@@ -4,10 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -44,6 +43,7 @@ fun ProductDetailsScreen(
 
     val lifecycleOwner = LocalLifecycleOwner.current
     val snackbarHostState = remember { SnackbarHostState() }
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
 
     LaunchedEffect(uiEffect) {
@@ -66,7 +66,18 @@ fun ProductDetailsScreen(
 
     }
 
-    BaseScreen(snackbarHostState = snackbarHostState) {
+    BaseScreen(navigationIcon = {
+        IconButton(onClick = {
+            navController.navigateUp()
+        }) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Clear"
+            )
+        }
+    }, snackbarHostState = snackbarHostState, scrollBehavior = scrollBehavior, title = {
+        Text(text = "Product Details", fontWeight = FontWeight.Bold)
+    }) {
         if (uiState.noData) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(text = "No Data available")
@@ -75,15 +86,13 @@ fun ProductDetailsScreen(
         } else {
             Column(
                 modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(
-                    top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
+                    top = (it.calculateTopPadding() + 16.dp),
                     start = 16.dp,
                     end = 16.dp,
-                    bottom = 16.dp
+                    bottom = (it.calculateBottomPadding() + 16.dp)
                 )
             ) {
                 uiState.product?.let { product ->
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = "Product Details", fontSize = 20.sp, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(12.dp))
                     ProductImage(
                         imageUrl = product.image, modifier = Modifier.fillMaxWidth().background(Color.LightGray)

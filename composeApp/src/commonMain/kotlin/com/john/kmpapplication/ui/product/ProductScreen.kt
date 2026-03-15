@@ -11,7 +11,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,6 +27,7 @@ import com.john.kmpapplication.ui.component.FilterChips
 import com.john.kmpapplication.ui.component.FullScreenLoader
 import com.john.kmpapplication.ui.component.ProductImage
 import com.john.kmpapplication.ui.component.SearchBar
+import com.john.kmpapplication.ui.navigation.AnimatedBottomBar
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 
@@ -46,8 +46,6 @@ fun ProductScreen(
     val searchBarColor = MaterialTheme.colorScheme.secondaryContainer
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val snackbarHostState = remember { SnackbarHostState() }
-
-
 
     LaunchedEffect(uiEffect) {
         uiEffect?.flowWithLifecycle(
@@ -88,6 +86,11 @@ fun ProductScreen(
 
         },
         snackbarHostState = snackbarHostState, scrollBehavior = scrollBehavior,
+        bottomBar = {
+            AnimatedBottomBar(
+                navController = navController
+            )
+        }
     ) {
 
         when {
