@@ -45,7 +45,6 @@ fun ProductScreen(
 ) {
 
     val lifecycleOwner = LocalLifecycleOwner.current
-    val searchBarColor = MaterialTheme.colorScheme.secondaryContainer
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -72,20 +71,13 @@ fun ProductScreen(
 
     BaseScreen(
         title = {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth().padding(end = 16.dp, top = 16.dp, bottom = 16.dp),
-                color = searchBarColor,
-            ) {
-                SearchBar(
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.background, CircleShape).fillMaxWidth(),
-                    query = uiState.searchQuery,
-                    onQueryChange = { query ->
-                        onEvent(ProductUiEvent.OnSearchQueryChanged(query))
-                    })
-            }
-
+            SearchBar(
+                modifier = Modifier.padding(end = 16.dp, top = 16.dp, bottom = 16.dp)
+                    .background(MaterialTheme.colorScheme.background, CircleShape).fillMaxWidth(),
+                query = uiState.searchQuery,
+                onQueryChange = { query ->
+                    onEvent(ProductUiEvent.OnSearchQueryChanged(query))
+                })
         },
         snackbarHostState = snackbarHostState, scrollBehavior = scrollBehavior,
         bottomBar = {
@@ -95,7 +87,7 @@ fun ProductScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {  },
+                onClick = { },
             ) {
                 Icon(Icons.Filled.Add, "Add")
             }
