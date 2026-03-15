@@ -1,8 +1,11 @@
 package com.john.kmpapplication.ui
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.*
@@ -50,7 +53,17 @@ fun BaseScreen(
 
         },
         floatingActionButton = floatingActionButton,
-        bottomBar = bottomBar,
+        bottomBar = {
+            val isVisible = scrollBehavior.state.heightOffset > -0.5f
+            AnimatedVisibility(
+                visible = isVisible,
+                enter = slideInVertically(initialOffsetY = { it }),
+                exit = slideOutVertically(targetOffsetY = { it })
+            ) {
+                bottomBar()
+            }
+
+        },
     ) { innerPadding ->
         content(innerPadding)
     }
