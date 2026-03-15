@@ -14,6 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -26,7 +28,10 @@ fun AnimatedBottomBar(
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
-    NavigationBar {
+    NavigationBar(
+        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
+        tonalElevation = 0.dp
+    ) {
         BottomNavigationItem.entries.forEach { item ->
             val isSelected = currentDestination?.hasRoute(item.route::class) == true
 
