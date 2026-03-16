@@ -6,6 +6,7 @@ import com.john.kmpapplication.db.AppDatabase
 import com.john.kmpapplication.db.AppDatabaseConstructor
 import com.john.kmpapplication.util.DatabaseConstant
 import kotlinx.cinterop.ExperimentalForeignApi
+import org.koin.core.module.Module
 import org.koin.dsl.module
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
@@ -26,7 +27,6 @@ fun getDatabaseBuilder(): RoomDatabase.Builder<AppDatabase> {
         factory = { AppDatabaseConstructor.initialize() }
     )
 }
-
-val platformModule = module {
-    single { getDatabaseBuilder() }
+actual fun platformModule(): Module = module {
+    single {    getDatabaseBuilder() }
 }

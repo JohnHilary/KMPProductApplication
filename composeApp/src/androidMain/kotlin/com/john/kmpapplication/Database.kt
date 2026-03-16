@@ -6,6 +6,7 @@ import androidx.room.RoomDatabase
 import com.john.kmpapplication.db.AppDatabase
 import com.john.kmpapplication.db.AppDatabaseConstructor
 import com.john.kmpapplication.util.DatabaseConstant
+import org.koin.core.module.Module
 import org.koin.dsl.module
 
 fun getDatabaseBuilder(ctx: Context): RoomDatabase.Builder<AppDatabase> {
@@ -19,6 +20,6 @@ fun getDatabaseBuilder(ctx: Context): RoomDatabase.Builder<AppDatabase> {
 }
 
 
-val platformModule = module {
+actual fun platformModule(): Module = module  {
     single { getDatabaseBuilder(get()) }
 }
