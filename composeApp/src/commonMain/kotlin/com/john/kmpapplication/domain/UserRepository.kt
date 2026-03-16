@@ -31,4 +31,6 @@ class UserRepository(private val userService: UserService, private val userDao: 
         val entity = userResponse.toEntity()
         userDao.insertUser(entity)
     }
+
+    suspend fun deleteUser() = userDao.deleteUser()
 }

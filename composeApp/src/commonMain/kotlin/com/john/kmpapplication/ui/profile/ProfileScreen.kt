@@ -28,6 +28,8 @@ import androidx.navigation.NavController
 import com.john.kmpapplication.ui.BaseScreen
 import com.john.kmpapplication.ui.component.AppImage
 import com.john.kmpapplication.ui.component.FullScreenLoader
+import com.john.kmpapplication.ui.component.dialog.AppDialog
+import com.john.kmpapplication.ui.component.dialog.DialogState
 import com.john.kmpapplication.ui.login.LoginScreen
 import com.john.kmpapplication.ui.navigation.AnimatedBottomBar
 import kotlinx.coroutines.flow.Flow
@@ -42,7 +44,9 @@ data object MyProfile {}
 @Composable
 fun MyProfileScreen(
     navController: NavController, uiEffect: Flow<ProfileUiEffect>? = null,
-    uiState: ProfileUiState = ProfileUiState()
+    uiState: ProfileUiState = ProfileUiState(),
+    dialogState: DialogState? = null,
+    onEvent: (ProfileUiEvent) -> Unit = {},
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -81,7 +85,9 @@ fun MyProfileScreen(
                     color = MaterialTheme.colorScheme.primaryContainer,
                     shadowElevation = 8.dp
                 ) {
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = {
+                        onEvent(ProfileUiEvent.LogoutIconClicked)
+                    }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Logout, contentDescription = "Logout"
                         )
@@ -187,6 +193,18 @@ fun MyProfileScreen(
                         navController.navigate(LoginScreen)
                     }
                 }
+            }
+            dialogState?.currentDialogData?.value?.let { data ->
+                val visuals = data.visuals
+                AppDialog(
+                    title = visuals.title,
+                    message = visuals.message,
+                    icon = visuals.icon,
+                    confirmLabel = visuals.positiveButton,
+                    dismissLabel = visuals.negativeButton,
+                    onConfirm = data::onPositive,
+                    onDismiss = data::onNegative
+                )
             }
             FullScreenLoader(isLoading = uiState.isLoading)
         }

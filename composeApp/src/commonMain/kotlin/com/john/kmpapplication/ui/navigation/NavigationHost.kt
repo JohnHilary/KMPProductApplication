@@ -57,7 +57,9 @@ fun NavigationHost() {
             MyProfileScreen(
                 navController = navController,
                 uiState = uiState,
-                uiEffect = viewModel.uiEffect
+                uiEffect = viewModel.uiEffect,
+                dialogState = viewModel.dialogState,
+                onEvent = { viewModel.onEvent(it) }
             )
         }
 
