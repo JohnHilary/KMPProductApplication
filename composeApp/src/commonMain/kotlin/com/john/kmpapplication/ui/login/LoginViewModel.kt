@@ -64,10 +64,7 @@ class LoginViewModel(private val repository: UserRepository) : ViewModel() {
             usernameError = "Username is empty"
             isValid = false
         }
-        if (!username.isValidName()) {
-            usernameError = "Username is not valid"
-            isValid = false
-        }
+
         if (password.isBlank()) {
             passwordError = "Password is empty"
             isValid = false
