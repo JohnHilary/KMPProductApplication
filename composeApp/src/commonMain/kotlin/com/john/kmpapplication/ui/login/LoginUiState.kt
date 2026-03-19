@@ -2,8 +2,8 @@ package com.john.kmpapplication.ui.login
 
 data class LoginUiState(
     val isLoading: Boolean = false,
-    val username: String = "",
+    val email: String = "",
     val password: String = "",
-    val usernameError: String? = null,
+    val emailError: String? = null,
     val passwordError: String? = null,
 )

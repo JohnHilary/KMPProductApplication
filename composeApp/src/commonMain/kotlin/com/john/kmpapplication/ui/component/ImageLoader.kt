@@ -51,7 +51,15 @@ fun AppImage(
                     .clip(shape),
                 contentScale = if (shape == CircleShape) ContentScale.Crop else ContentScale.Fit,
                 onLoading = {
-                    CircularProgressIndicator()
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            strokeWidth = 2.dp
+                        )
+                    }
                 },
                 onFailure = { _ ->
                     Box(

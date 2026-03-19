@@ -5,8 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.john.kmpapplication.data.LoginResponse
 import com.john.kmpapplication.data.remote.ApiResult
 import com.john.kmpapplication.domain.UserRepository
-import com.john.kmpapplication.util.AppUtils.isValidName
-import com.john.kmpapplication.util.JwtDecoder
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,8 +29,8 @@ class LoginViewModel(private val repository: UserRepository) : ViewModel() {
 
     fun onEvent(event: LoginUiEvent) {
         when (event) {
-            is LoginUiEvent.OnUsernameChanged -> onEmailChanged(event.username)
-            is LoginUiEvent.OnLoginButtonClick -> validateAndLogin(username = event.username, password = event.password)
+            is LoginUiEvent.OnEmailChanged -> onEmailChanged(event.email)
+            is LoginUiEvent.OnLoginButtonClick -> validateAndLogin(email = event.email, password = event.password)
             is LoginUiEvent.OnPasswordChanged -> onPasswordChanged(event.password)
             LoginUiEvent.OnSignUpButtonClick -> {
                 viewModelScope.launch {
@@ -45,7 +43,7 @@ class LoginViewModel(private val repository: UserRepository) : ViewModel() {
 
     private fun onEmailChanged(email: String) {
         _uiState.update {
-            it.copy(username = email, usernameError = null)
+            it.copy(email = email, emailError = null)
         }
     }
 
@@ -55,13 +53,13 @@ class LoginViewModel(private val repository: UserRepository) : ViewModel() {
         }
     }
 
-    private fun validateAndLogin(username: String, password: String) {
+    private fun validateAndLogin(email: String, password: String) {
         var isValid = true
-        var usernameError: String? = null
+        var emailError: String? = null
         var passwordError: String? = null
 
-        if (username.isBlank()) {
-            usernameError = "Username is empty"
+        if (email.isBlank()) {
+            emailError = "Email is empty"
             isValid = false
         }
 
@@ -71,26 +69,31 @@ class LoginViewModel(private val repository: UserRepository) : ViewModel() {
         }
 
         _uiState.value = _uiState.value.copy(
-            usernameError = usernameError,
+            emailError = emailError,
             passwordError = passwordError
         )
 
         if (!isValid) return
 
-        login(username, password)
+        login(email, password)
     }
 
 
-    private fun login(username: String, password: String) {
+    private fun login(email: String, password: String) {
         viewModelScope.launch {
             try {
                 setLoading(true)
-                when (val result = repository.login(username, password)) {
+                when (val result = repository.login(email, password)) {
                     is ApiResult.Error -> throw Exception(result.message)
                     is ApiResult.Exception -> throw result.throwable
                     is ApiResult.Success<LoginResponse> -> {
-                        val user = JwtDecoder.decodePayload(result.data.token)
-                        getUser(id = user.userId)
+                        val tokens = result.data
+                        repository.saveTokens(
+                            accessToken = tokens.accessToken,
+                            refreshToken = tokens.refreshToken
+                        )
+                        getProfile()
+
                     }
                 }
             } catch (e: Exception) {
@@ -104,12 +107,12 @@ class LoginViewModel(private val repository: UserRepository) : ViewModel() {
         }
     }
 
-    suspend fun getUser(id: Int?) {
-        when (val result = repository.getUser(id)) {
+    suspend fun getProfile() {
+        when (val result = repository.getProfile()) {
             is ApiResult.Error -> throw Exception(result.message)
             is ApiResult.Exception -> throw result.throwable
             is ApiResult.Success -> {
-                repository.insertUser(userResponse = result.data)
+                repository.insertUser(profileResponse = result.data)
                 setLoading(false)
                 _uiEffect.send(LoginUiEffect.NavigateBack)
             }

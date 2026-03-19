@@ -6,14 +6,14 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 
 class UserService(
-    private val client: HttpClient
+    private val client: HttpClient,
 ) {
-    suspend fun login(username: String, password: String) =
-        client.post("auth/login") {
+    suspend fun login(email: String, password: String) =
+        client.post ("/api/v1/auth/login") {
             contentType(ContentType.Application.Json)
-            setBody(LoginRequest(username, password))
+            setBody(LoginRequest(email, password))
         }
 
-    suspend fun getUser(id: Int?) = client.get("users/$id")
+    suspend fun getProfile() = client.get("/api/v1/auth/profile")
 
 }

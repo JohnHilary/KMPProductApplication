@@ -39,6 +39,9 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.koin.compose)
             implementation(libs.koin.android)
+            implementation("androidx.datastore:datastore-preferences-core:1.2.1")
+            implementation("androidx.datastore:datastore-preferences:1.2.1")
+
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -71,6 +74,7 @@ kotlin {
             implementation("org.jetbrains.compose.material:material-icons-extended:1.7.3")
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)
+            implementation("io.ktor:ktor-client-auth:3.4.0")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

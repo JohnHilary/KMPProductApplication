@@ -1,6 +1,8 @@
 package com.john.kmpapplication
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.john.kmpapplication.db.AppDatabase
@@ -22,4 +24,6 @@ fun getDatabaseBuilder(ctx: Context): RoomDatabase.Builder<AppDatabase> {
 
 actual fun platformModule(): Module = module  {
     single { getDatabaseBuilder(get()) }
+    single<TokenStorage> { AndroidTokenStorage(get()) }
+    single<DataStore<Preferences>> { createDataStore(get()) }
 }
