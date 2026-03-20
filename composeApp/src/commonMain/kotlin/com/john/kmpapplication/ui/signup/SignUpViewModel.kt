@@ -1,4 +1,4 @@
-package com.john.kmpapplication.ui.component.signup
+package com.john.kmpapplication.ui.signup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -40,6 +40,7 @@ class SignUpViewModel(private val userRepository: UserRepository) : ViewModel() 
 
             is SignUpUiEvent.OnUsernameChanged -> onUsernameChanged(event.username)
             SignUpUiEvent.OnSignUpButtonClick -> validateAndSignUp()
+            is SignUpUiEvent.OnImageUploadClicked -> uploadImage(event.image)
         }
     }
 
@@ -103,7 +104,43 @@ class SignUpViewModel(private val userRepository: UserRepository) : ViewModel() 
         }
     }
 
+    private fun uploadImage(image: ByteArray?){
+        viewModelScope.launch {
+            try {
+                if (image == null) {
+                    _uiEffect.send(
+                        SignUpUiEffect.ShowSnackbar("Image is required")
+                    )
+                    return@launch
+                }
+                setLoading(true)
+                when (val response = userRepository.uploadFile(image)) {
+                    is ApiResult.Error -> throw Exception(response.message)
+                    is ApiResult.Exception -> throw response.throwable
+                    is ApiResult.Success -> {
+                        onImageChange(image = response.data.location)
+                        setLoading(false)
+                    }
+                }
+            } catch (e: Exception) {
+                setLoading(false)
+                _uiEffect.send(
+                    SignUpUiEffect.ShowSnackbar(
+                        e.message ?: "Something went wrong",
+                    )
+                )
+            }
+        }
+    }
 
+
+
+
+    private fun onImageChange(image: String) {
+        _uiState.update {
+            it.copy(image = image)
+        }
+    }
     private fun onEmailChanged(email: String) {
         _uiState.update {
             it.copy(email = email)

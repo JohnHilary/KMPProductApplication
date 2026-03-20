@@ -1,8 +1,8 @@
-package com.john.kmpapplication.ui.component.signup
+package com.john.kmpapplication.ui.signup
 
 data class SignUpUiState(
     val isLoading: Boolean = false,
-    val image : String = "https://picsum.photos/800",
+    val image : String = "",
     val username: String = "",
     val email: String = "",
     val password: String = "",

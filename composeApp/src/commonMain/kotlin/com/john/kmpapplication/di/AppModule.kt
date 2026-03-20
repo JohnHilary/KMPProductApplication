@@ -9,7 +9,7 @@ import com.john.kmpapplication.domain.ProductService
 import com.john.kmpapplication.domain.ProductRepository
 import com.john.kmpapplication.domain.UserRepository
 import com.john.kmpapplication.domain.UserService
-import com.john.kmpapplication.ui.component.signup.SignUpViewModel
+import com.john.kmpapplication.ui.signup.SignUpViewModel
 import com.john.kmpapplication.ui.login.LoginViewModel
 import com.john.kmpapplication.ui.product.ProductDetailViewModel
 import com.john.kmpapplication.ui.product.ProductViewModel

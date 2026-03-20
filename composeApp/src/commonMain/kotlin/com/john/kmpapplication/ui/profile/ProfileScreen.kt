@@ -48,7 +48,6 @@ fun MyProfileScreen(
     dialogState: DialogState? = null,
     onEvent: (ProfileUiEvent) -> Unit = {},
 ) {
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val snackbarHostState = remember { SnackbarHostState() }
     val lifecycleOwner = LocalLifecycleOwner.current
 
@@ -74,7 +73,7 @@ fun MyProfileScreen(
 
     BaseScreen(
         snackbarHostState = snackbarHostState,
-        scrollBehavior = scrollBehavior, topBarColors = TopAppBarDefaults.topAppBarColors(
+       topBarColors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.surface,
             scrolledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f)
         ), title = {}, actions = {
@@ -119,7 +118,6 @@ fun MyProfileScreen(
                         Spacer(modifier = Modifier.height(12.dp))
                         AppImage(
                             imageUrl = user.avatar,
-                            size = 160.dp,
                             shape = CircleShape,
                             defaultIcon = Icons.Filled.Person,
                             shadowElevation = 8.dp,

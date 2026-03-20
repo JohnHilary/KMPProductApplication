@@ -1,12 +1,14 @@
-package com.john.kmpapplication.ui.component.signup
+package com.john.kmpapplication.ui.signup
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -28,12 +30,19 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
+import com.john.kmpapplication.ImagePicker
+import com.john.kmpapplication.LocalImagePicker
+import com.john.kmpapplication.PickerType
 import com.john.kmpapplication.ui.BaseScreen
+import com.john.kmpapplication.ui.component.AppImage
 import com.john.kmpapplication.ui.component.FullScreenLoader
+import com.john.kmpapplication.ui.component.dialog.ImageSourceDialog
 import com.john.kmpapplication.ui.login.LoginScreen
 import com.john.kmpapplication.ui.profile.MyProfile
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
+import org.koin.compose.koinInject
+import org.koin.core.parameter.parametersOf
 
 
 @Serializable
@@ -50,9 +59,12 @@ fun SignUpScreen(
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     var passwordVisible by retain { mutableStateOf(false) }
-
-
     val lifecycleOwner = LocalLifecycleOwner.current
+    var showImageDialog by retain { mutableStateOf(false) }
+
+    val picker = LocalImagePicker.current
+
+
 
     LaunchedEffect(uiEffect) {
         uiEffect?.flowWithLifecycle(
@@ -128,6 +140,21 @@ fun SignUpScreen(
                         modifier = Modifier.fillMaxSize().padding(24.dp).verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
+
+                        AppImage(
+                            modifier = Modifier.align(Alignment.CenterHorizontally),
+                            imageUrl = uiState.image,
+                            size = 160.dp,
+                            shape = CircleShape,
+                            defaultIcon = Icons.Filled.Person,
+                            shadowElevation = 8.dp,
+                            backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
+                            onClick = {
+                                 showImageDialog = true
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+
                         OutlinedTextField(
                             value = uiState.username,
                             onValueChange = { onEvent(SignUpUiEvent.OnUsernameChanged(it)) },
@@ -233,6 +260,28 @@ fun SignUpScreen(
                 }
             }
             FullScreenLoader(isLoading = uiState.isLoading)
+            if (showImageDialog) {
+                ImageSourceDialog(
+                    onDismiss = {
+                        showImageDialog = false
+                    }, onGallerySelect = {
+                        picker.pickImage(
+                            type = PickerType.GALLERY,
+                            onResult = {
+                                showImageDialog = false
+                                onEvent(SignUpUiEvent.OnImageUploadClicked(it?.copyOf()))
+                            })
+                    },
+                    onCameraSelect = {
+                        picker.pickImage(
+                            type = PickerType.CAMERA,
+                            onResult = {
+                                showImageDialog = false
+                                onEvent(SignUpUiEvent.OnImageUploadClicked(it?.copyOf()))
+                            })
+
+                    })
+            }
         }
     }
 }

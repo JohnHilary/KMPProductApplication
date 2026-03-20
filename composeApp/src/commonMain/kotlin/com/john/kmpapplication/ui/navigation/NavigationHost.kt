@@ -9,8 +9,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.john.kmpapplication.ui.component.signup.SignUpScreen
-import com.john.kmpapplication.ui.component.signup.SignUpViewModel
+import com.john.kmpapplication.ui.signup.SignUpScreen
+import com.john.kmpapplication.ui.signup.SignUpViewModel
 import com.john.kmpapplication.ui.login.LoginScreen
 import com.john.kmpapplication.ui.login.LoginViewModel
 import com.john.kmpapplication.ui.product.*

@@ -1,5 +1,6 @@
 package com.john.kmpapplication.domain
 
+import com.john.kmpapplication.data.FileUploadResponse
 import com.john.kmpapplication.data.LoginResponse
 import com.john.kmpapplication.data.ProfileResponse
 import com.john.kmpapplication.data.SignUpRequest
@@ -32,6 +33,12 @@ class UserRepository(
     suspend fun signUp(signUpRequest: SignUpRequest): ApiResult<ProfileResponse> {
         return handleApi {
             userService.signUp(signUpRequest)
+        }
+    }
+
+    suspend fun uploadFile(image: ByteArray): ApiResult<FileUploadResponse> {
+        return handleApi {
+            userService.uploadFile(image)
         }
     }
 

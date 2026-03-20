@@ -34,7 +34,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.john.kmpapplication.ui.BaseScreen
 import com.john.kmpapplication.ui.component.FullScreenLoader
-import com.john.kmpapplication.ui.component.signup.SignUpScreen
+import com.john.kmpapplication.ui.signup.SignUpScreen
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 

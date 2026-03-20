@@ -22,8 +22,9 @@ fun getDatabaseBuilder(ctx: Context): RoomDatabase.Builder<AppDatabase> {
 }
 
 
-actual fun platformModule(): Module = module  {
+actual fun platformModule(): Module = module {
     single { getDatabaseBuilder(get()) }
     single<TokenStorage> { AndroidTokenStorage(get()) }
     single<DataStore<Preferences>> { createDataStore(get()) }
+    factory { ImagePicker(activity = get()) }
 }

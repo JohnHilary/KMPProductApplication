@@ -1,4 +1,4 @@
-package com.john.kmpapplication.ui.component.signup
+package com.john.kmpapplication.ui.signup
 
 
 
@@ -8,4 +8,5 @@ sealed interface SignUpUiEvent {
     data class OnPasswordChanged(val password: String) : SignUpUiEvent
     data object OnSignUpButtonClick : SignUpUiEvent
     data object OnLoginButtonClick : SignUpUiEvent
+    data class OnImageUploadClicked(val image: ByteArray?) : SignUpUiEvent
 }

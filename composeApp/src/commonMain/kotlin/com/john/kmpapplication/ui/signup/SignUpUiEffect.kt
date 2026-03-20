@@ -1,4 +1,4 @@
-package com.john.kmpapplication.ui.component.signup
+package com.john.kmpapplication.ui.signup
 
 sealed interface SignUpUiEffect {
 
