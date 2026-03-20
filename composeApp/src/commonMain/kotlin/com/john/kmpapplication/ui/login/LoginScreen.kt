@@ -145,7 +145,8 @@ fun LoginScreen(
                                     )
                                 }
                             },
-                            maxLines = 1
+                            maxLines = 1,
+                            singleLine = true
                         )
                         Spacer(Modifier.height(16.dp))
                         OutlinedTextField(
@@ -178,7 +179,9 @@ fun LoginScreen(
                                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
                                     Icon(imageVector = image, contentDescription = description)
                                 }
-                            }
+                            },
+                            singleLine = true
+
                         )
                         Spacer(Modifier.height(24.dp))
                         Button(

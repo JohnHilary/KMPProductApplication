@@ -81,7 +81,7 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
         viewModelScope.launch {
             setLoading(true)
             delay(1000)
-            userRepository.deleteUser()
+            userRepository.logout()
             setLoading(false)
             dialogState.showDialog(
                 icon = Icons.Default.CheckCircle,

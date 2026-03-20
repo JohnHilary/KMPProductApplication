@@ -12,19 +12,19 @@ class AndroidTokenStorage(
     private val dataStore: DataStore<Preferences>
 ) : TokenStorage {
 
-    private val authTokenKey = stringPreferencesKey("auth_token")
-    private val refreshTokenKey = stringPreferencesKey("auth_token")
+    private val accessTokenKey = stringPreferencesKey("auth_token")
+    private val refreshTokenKey = stringPreferencesKey("refresh_token")
 
     override suspend fun saveAccessToken(token: String) {
-        dataStore.edit { it[authTokenKey] = token }
+        dataStore.edit { it[accessTokenKey] = token }
     }
 
     override suspend fun getAccessToken(): String? {
-        return dataStore.data.first()[authTokenKey]
+        return dataStore.data.first()[accessTokenKey]
     }
 
     override suspend fun clearToken() {
-        dataStore.edit { it.remove(authTokenKey) }
+        dataStore.edit { it.remove(accessTokenKey) }
         dataStore.edit { it.remove(refreshTokenKey) }
     }
 

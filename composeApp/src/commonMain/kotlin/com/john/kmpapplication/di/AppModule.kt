@@ -29,6 +29,7 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
+import io.ktor.http.encodedPath
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import org.koin.core.module.dsl.viewModel
@@ -74,7 +75,11 @@ val appModule = module {
                         } else null
                     }
                     refreshTokens {
-                   val response = client.post("/api/v1/auth/refresh-token") {
+                        if (oldTokens?.refreshToken.isNullOrEmpty()) {
+                            return@refreshTokens null
+                        }
+
+                        val response = client.post("/api/v1/auth/refresh-token") {
                             markAsRefreshTokenRequest()
                             setBody(mapOf("refreshToken" to oldTokens?.refreshToken))
                             contentType(ContentType.Application.Json)
@@ -96,7 +101,8 @@ val appModule = module {
                         }
                     }
                     sendWithoutRequest { request ->
-                        !request.url.pathSegments.contains("login")
+                        val path = request.url.encodedPath
+                        !path.contains("/auth/login") || !path.contains("/auth/refresh-token")
                     }
                 }
             }
