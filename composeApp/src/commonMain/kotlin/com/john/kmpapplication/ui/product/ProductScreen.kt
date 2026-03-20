@@ -128,7 +128,7 @@ fun ProductScreen(
                     if (!uiState.isLoading) {
                         items(uiState.products, key = { it.id }) {
                             ProductItem(
-                                modifier = Modifier.heightIn(min = 200.dp),
+                                modifier = Modifier.heightIn(min = 200.dp).fillMaxWidth(),
                                 product = it,
                                 onClick = {
                                     onEvent(ProductUiEvent.NavigateToDetail(id = it.id))
