@@ -9,6 +9,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.john.kmpapplication.ui.component.signup.SignUpScreen
+import com.john.kmpapplication.ui.component.signup.SignUpViewModel
 import com.john.kmpapplication.ui.login.LoginScreen
 import com.john.kmpapplication.ui.login.LoginViewModel
 import com.john.kmpapplication.ui.product.*
@@ -67,6 +69,17 @@ fun NavigationHost() {
             val viewModel = koinViewModel<LoginViewModel>()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             LoginScreen(
+                navController = navController,
+                uiState = uiState,
+                uiEffect = viewModel.uiEffect,
+            ) {
+                viewModel.onEvent(it)
+            }
+        }
+        composable<SignUpScreen> {
+            val viewModel = koinViewModel<SignUpViewModel>()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            SignUpScreen(
                 navController = navController,
                 uiState = uiState,
                 uiEffect = viewModel.uiEffect,

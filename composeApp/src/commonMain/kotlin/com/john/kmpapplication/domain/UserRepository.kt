@@ -2,6 +2,7 @@ package com.john.kmpapplication.domain
 
 import com.john.kmpapplication.data.LoginResponse
 import com.john.kmpapplication.data.ProfileResponse
+import com.john.kmpapplication.data.SignUpRequest
 import com.john.kmpapplication.data.TokenManager
 import com.john.kmpapplication.data.remote.ApiResult
 import com.john.kmpapplication.data.remote.handleApi
@@ -25,6 +26,12 @@ class UserRepository(
     suspend fun getProfile(): ApiResult<ProfileResponse> {
         return handleApi {
             userService.getProfile()
+        }
+    }
+
+    suspend fun signUp(signUpRequest: SignUpRequest): ApiResult<ProfileResponse> {
+        return handleApi {
+            userService.signUp(signUpRequest)
         }
     }
 

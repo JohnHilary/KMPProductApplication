@@ -1,21 +1,18 @@
-package com.john.kmpapplication.ui.login
+package com.john.kmpapplication.ui.component.signup
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.runtime.retain.retain
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,42 +28,60 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.john.kmpapplication.ui.BaseScreen
 import com.john.kmpapplication.ui.component.FullScreenLoader
-import com.john.kmpapplication.ui.component.signup.SignUpScreen
+import com.john.kmpapplication.ui.login.LoginScreen
+import com.john.kmpapplication.ui.profile.MyProfile
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 
+
+@Serializable
+data object SignUpScreen
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(
-    navController: NavController = rememberNavController(),
-    uiState: LoginUiState = LoginUiState(),
-    uiEffect: Flow<LoginUiEffect>? = null,
-    onEvent: (LoginUiEvent) -> Unit = {},
+fun SignUpScreen(
+    navController: NavController,
+    uiState: SignUpUiState,
+    uiEffect: Flow<SignUpUiEffect>?,
+    onEvent: (SignUpUiEvent) -> Unit,
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    var passwordVisible by retain { mutableStateOf(false) }
 
 
     val lifecycleOwner = LocalLifecycleOwner.current
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-    val snackbarHostState = remember { SnackbarHostState() }
-    var passwordVisible by retain { mutableStateOf(false) }
+
     LaunchedEffect(uiEffect) {
         uiEffect?.flowWithLifecycle(
             lifecycleOwner.lifecycle,
             Lifecycle.State.STARTED
         )?.collect { effect ->
             when (effect) {
-                LoginUiEffect.NavigateToSignUp -> navController.navigate(SignUpScreen)
-                is LoginUiEffect.ShowSnackbar -> {
+                SignUpUiEffect.NavigateToLogin -> navController.navigate(LoginScreen) {
+                    popUpTo(SignUpScreen) {
+                        inclusive = true
+                    }
+                }
+
+                is SignUpUiEffect.ShowSnackbar -> {
                     val result = snackbarHostState.showSnackbar(
                         message = effect.message,
                         actionLabel = effect.actionLabel
                     )
 
                 }
-                LoginUiEffect.NavigateBack -> navController.navigateUp()
+
+                SignUpUiEffect.NavigateBack -> navController.navigateUp()
+                SignUpUiEffect.NavigateToProfile -> {
+                    navController.navigate(MyProfile) {
+                        popUpTo(SignUpScreen) {
+                            inclusive = true
+                        }
+                    }
+                }
             }
         }
     }
@@ -74,69 +89,70 @@ fun LoginScreen(
 
     BaseScreen(
         snackbarHostState = snackbarHostState,
-        scrollBehavior = scrollBehavior,
         navigationIcon = {
-            IconButton(onClick = {
-                navController.navigateUp()
-            }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Clear"
-                )
+            IconButton(onClick = { navController.navigateUp() }) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
         }
     ) {
-
         Box(modifier = Modifier.fillMaxSize()) {
             Column {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(0.45f)
+                        .weight(0.40f)
                         .background(MaterialTheme.colorScheme.primaryContainer),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(
-                            imageVector = Icons.Default.AccountCircle,
+                            imageVector = Icons.Default.PersonAdd,
                             contentDescription = null,
-                            modifier = Modifier.size(100.dp),
+                            modifier = Modifier.size(90.dp),
                             tint = MaterialTheme.colorScheme.onPrimaryContainer
                         )
-                        Spacer(Modifier.height(12.dp))
                         Text(
-                            text = "Welcome Back",
+                            text = "Create Account",
                             style = MaterialTheme.typography.headlineMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     }
                 }
+
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(0.55f),
-                    shape = RoundedCornerShape(
-                        topStart = 40.dp,
-                        topEnd = 40.dp
-                    ),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    )
+                    modifier = Modifier.fillMaxWidth().weight(0.60f),
+                    shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                 ) {
                     Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(24.dp),
-                        verticalArrangement = Arrangement.Center
+                        modifier = Modifier.fillMaxSize().padding(24.dp).verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         OutlinedTextField(
+                            value = uiState.username,
+                            onValueChange = { onEvent(SignUpUiEvent.OnUsernameChanged(it)) },
+                            label = { Text("Username") },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true,
+                            maxLines = 1,
+                            supportingText = {
+                                if (uiState.usernameError != null) {
+                                    Text(
+                                        text = uiState.usernameError,
+                                        color = Color.Red,
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
+                            }
+                            )
+
+                        OutlinedTextField(
                             value = uiState.email,
-                            onValueChange = {
-                                onEvent(LoginUiEvent.OnEmailChanged(it))
-                            },
+                            onValueChange = { onEvent(SignUpUiEvent.OnEmailChanged(it)) },
                             label = { Text("Email") },
                             modifier = Modifier.fillMaxWidth(),
-                            isError = uiState.emailError != null,
+                            singleLine = true,
+                            maxLines = 1,
                             supportingText = {
                                 if (uiState.emailError != null) {
                                     Text(
@@ -145,30 +161,16 @@ fun LoginScreen(
                                         style = MaterialTheme.typography.bodySmall
                                     )
                                 }
-                            },
-                            maxLines = 1,
-                            singleLine = true
+                            }
                         )
-                        Spacer(Modifier.height(16.dp))
+
                         OutlinedTextField(
                             value = uiState.password,
-                            onValueChange = {
-                                onEvent(LoginUiEvent.OnPasswordChanged(it))
-
-                            },
+                            onValueChange = { onEvent(SignUpUiEvent.OnPasswordChanged(it)) },
                             label = { Text("Password") },
-                            modifier = Modifier.fillMaxWidth(),
-                            isError = uiState.passwordError != null,
-                            supportingText = {
-                                if (uiState.passwordError != null) {
-                                    Text(
-                                        text = uiState.passwordError,
-                                        color = Color.Red,
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
-                                }
-                            },
                             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true,
                             maxLines = 1,
                             trailingIcon = {
                                 val image = if (passwordVisible)
@@ -181,34 +183,38 @@ fun LoginScreen(
                                     Icon(imageVector = image, contentDescription = description)
                                 }
                             },
-                            singleLine = true
+                            supportingText = {
+                                if (uiState.passwordError != null) {
+                                    Text(
+                                        text = uiState.passwordError,
+                                        color = Color.Red,
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
+                            }
 
                         )
-                        Spacer(Modifier.height(24.dp))
+
                         Button(
-                            onClick = {
-                                onEvent(
-                                    LoginUiEvent.OnLoginButtonClick(
-                                        email = uiState.email,
-                                        password = uiState.password
-                                    )
-                                )
-                            },
-                            modifier = Modifier.fillMaxWidth()
+                            onClick = { onEvent(SignUpUiEvent.OnSignUpButtonClick) },
+                            modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
                         ) {
-                            Text("Login")
+                            Text("Register")
                         }
-                        Spacer(Modifier.height(16.dp))
+                        Spacer(Modifier.height(8.dp))
+
                         Row(
                             horizontalArrangement = Arrangement.Center,
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             val annotatedText = buildAnnotatedString {
-                                append("Don't have an account? ")
+                                append("Already have an account? ")
                                 pushLink(
                                     LinkAnnotation.Clickable(
-                                        tag = "signup",
-                                        linkInteractionListener = { onEvent(LoginUiEvent.OnSignUpButtonClick) }
+                                        tag = "login",
+                                        linkInteractionListener = {
+                                            onEvent(SignUpUiEvent.OnLoginButtonClick)
+                                        }
                                     )
                                 )
                                 withStyle(
@@ -217,7 +223,7 @@ fun LoginScreen(
                                         fontWeight = FontWeight.Bold
                                     )
                                 ) {
-                                    append("Sign up")
+                                    append("Log in")
                                 }
                                 pop()
                             }
@@ -226,14 +232,7 @@ fun LoginScreen(
                     }
                 }
             }
-            FullScreenLoader(
-                modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.3f)),
-                isLoading = uiState.isLoading
-            )
-
+            FullScreenLoader(isLoading = uiState.isLoading)
         }
     }
 }
-
-@Serializable
-data object LoginScreen
