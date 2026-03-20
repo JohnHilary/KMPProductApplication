@@ -72,7 +72,7 @@ fun ProductScreen(
     BaseScreen(
         title = {
             SearchBar(
-                modifier = Modifier.padding(end = 16.dp, top = 16.dp, bottom = 16.dp)
+                modifier = Modifier.padding(end = 16.dp, top = 8.dp, bottom = 8.dp)
                     .background(MaterialTheme.colorScheme.background, CircleShape).fillMaxWidth(),
                 query = uiState.searchQuery,
                 onQueryChange = { query ->
