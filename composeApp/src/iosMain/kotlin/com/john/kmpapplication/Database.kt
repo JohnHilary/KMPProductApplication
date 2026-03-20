@@ -29,4 +29,5 @@ fun getDatabaseBuilder(): RoomDatabase.Builder<AppDatabase> {
 }
 actual fun platformModule(): Module = module {
     single {    getDatabaseBuilder() }
+    single<TokenStorage> { IosTokenStorage() }
 }

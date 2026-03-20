@@ -1,7 +1,8 @@
 package com.john.kmpapplication.domain
 
 import com.john.kmpapplication.data.LoginResponse
-import com.john.kmpapplication.data.UserResponse
+import com.john.kmpapplication.data.ProfileResponse
+import com.john.kmpapplication.data.TokenManager
 import com.john.kmpapplication.data.remote.ApiResult
 import com.john.kmpapplication.data.remote.handleApi
 import com.john.kmpapplication.data.toEntity
@@ -9,17 +10,21 @@ import com.john.kmpapplication.db.UserDao
 import com.john.kmpapplication.db.UserEntity
 import kotlinx.coroutines.flow.Flow
 
-class UserRepository(private val userService: UserService, private val userDao: UserDao) {
+class UserRepository(
+    private val userService: UserService,
+    private val userDao: UserDao,
+    private val tokenManager: TokenManager
+) {
 
-    suspend fun login(username: String, password: String): ApiResult<LoginResponse> {
+    suspend fun login(email: String, password: String): ApiResult<LoginResponse> {
         return handleApi {
-            userService.login(username, password)
+            userService.login(email, password)
         }
     }
 
-    suspend fun getUser(id: Int?): ApiResult<UserResponse> {
+    suspend fun getProfile(): ApiResult<ProfileResponse> {
         return handleApi {
-            userService.getUser(id)
+            userService.getProfile()
         }
     }
 
@@ -27,10 +32,22 @@ class UserRepository(private val userService: UserService, private val userDao: 
         return userDao.getUser()
     }
 
-    suspend fun insertUser(userResponse: UserResponse) {
-        val entity = userResponse.toEntity()
+    suspend fun insertUser(profileResponse: ProfileResponse) {
+        val entity = profileResponse.toEntity()
         userDao.insertUser(entity)
     }
 
     suspend fun deleteUser() = userDao.deleteUser()
+
+    suspend fun saveTokens(accessToken: String, refreshToken: String) {
+        tokenManager.saveAccessToken(accessToken)
+        tokenManager.saveRefreshToken(refreshToken)
+    }
+
+    suspend fun logout() {
+        tokenManager.clearToken()
+        userDao.deleteUser()
+    }
+
+    val sessionExpiredEvent = tokenManager.logoutEvent
 }

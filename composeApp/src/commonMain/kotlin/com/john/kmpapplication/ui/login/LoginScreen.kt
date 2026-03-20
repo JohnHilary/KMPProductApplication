@@ -129,17 +129,17 @@ fun LoginScreen(
                         verticalArrangement = Arrangement.Center
                     ) {
                         OutlinedTextField(
-                            value = uiState.username,
+                            value = uiState.email,
                             onValueChange = {
-                                onEvent(LoginUiEvent.OnUsernameChanged(it))
+                                onEvent(LoginUiEvent.OnEmailChanged(it))
                             },
-                            label = { Text("Username") },
+                            label = { Text("Email") },
                             modifier = Modifier.fillMaxWidth(),
-                            isError = uiState.usernameError != null,
+                            isError = uiState.emailError != null,
                             supportingText = {
-                                if (uiState.usernameError != null) {
+                                if (uiState.emailError != null) {
                                     Text(
-                                        text = uiState.usernameError,
+                                        text = uiState.emailError,
                                         color = Color.Red,
                                         style = MaterialTheme.typography.bodySmall
                                     )
@@ -185,7 +185,7 @@ fun LoginScreen(
                             onClick = {
                                 onEvent(
                                     LoginUiEvent.OnLoginButtonClick(
-                                        username = uiState.username,
+                                        email = uiState.email,
                                         password = uiState.password
                                     )
                                 )

@@ -118,7 +118,7 @@ fun MyProfileScreen(
 
                         Spacer(modifier = Modifier.height(12.dp))
                         AppImage(
-                            imageUrl = "",
+                            imageUrl = user.avatar,
                             size = 160.dp,
                             shape = CircleShape,
                             defaultIcon = Icons.Filled.Person,

@@ -40,6 +40,19 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
 
     val dialogState = DialogHostState()
 
+    init {
+        observeLogoutEvent()
+    }
+
+    private fun observeLogoutEvent() {
+        viewModelScope.launch {
+            userRepository.sessionExpiredEvent.collect {
+                userRepository.logout()
+                _uiEffect.send(ProfileUiEffect.ShowSnackbar("Session Expired"))
+            }
+        }
+    }
+
     fun onEvent(uiEvent: ProfileUiEvent) {
         when (uiEvent) {
             is ProfileUiEvent.LogoutIconClicked -> {
