@@ -8,8 +8,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
@@ -30,7 +30,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
-import com.john.kmpapplication.ImagePicker
 import com.john.kmpapplication.LocalImagePicker
 import com.john.kmpapplication.PickerType
 import com.john.kmpapplication.ui.BaseScreen
@@ -41,8 +40,6 @@ import com.john.kmpapplication.ui.login.LoginScreen
 import com.john.kmpapplication.ui.profile.MyProfile
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
-import org.koin.compose.koinInject
-import org.koin.core.parameter.parametersOf
 
 
 @Serializable
@@ -61,6 +58,7 @@ fun SignUpScreen(
     var passwordVisible by retain { mutableStateOf(false) }
     val lifecycleOwner = LocalLifecycleOwner.current
     var showImageDialog by retain { mutableStateOf(false) }
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     val picker = LocalImagePicker.current
 
@@ -101,14 +99,24 @@ fun SignUpScreen(
 
     BaseScreen(
         snackbarHostState = snackbarHostState,
+        scrollBehavior = scrollBehavior,
+        title = {
+                Text(
+                    text = "Create Account",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+
+        },
         navigationIcon = {
             IconButton(onClick = { navController.navigateUp() }) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
         }
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize().padding(it)) {
             Column {
+
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -117,17 +125,33 @@ fun SignUpScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(
-                            imageVector = Icons.Default.PersonAdd,
-                            contentDescription = null,
-                            modifier = Modifier.size(90.dp),
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                        Text(
-                            text = "Create Account",
-                            style = MaterialTheme.typography.headlineMedium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
+                        Box(modifier = Modifier.padding(16.dp)) {
+                            AppImage(
+                                modifier = Modifier.align(Alignment.Center),
+                                imageUrl = uiState.image,
+                                shape = CircleShape,
+                                defaultIcon = Icons.Filled.Person,
+                                shadowElevation = 8.dp,
+                                backgroundColor = MaterialTheme.colorScheme.secondaryContainer
+                            )
+                            Surface(
+                                modifier = Modifier
+                                    .align(Alignment.BottomEnd)
+                                    .size(36.dp)
+                                    .offset(x = (-8).dp, y = (-8).dp),
+                                shape = CircleShape,
+                                color = MaterialTheme.colorScheme.primary,
+                                tonalElevation = 4.dp,
+                                onClick = { showImageDialog = true }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.AddAPhoto,
+                                    contentDescription = "Upload Image",
+                                    tint = MaterialTheme.colorScheme.onPrimary,
+                                    modifier = Modifier.padding(8.dp)
+                                )
+                            }
+                        }
                     }
                 }
 
@@ -141,19 +165,6 @@ fun SignUpScreen(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
 
-                        AppImage(
-                            modifier = Modifier.align(Alignment.CenterHorizontally),
-                            imageUrl = uiState.image,
-                            size = 160.dp,
-                            shape = CircleShape,
-                            defaultIcon = Icons.Filled.Person,
-                            shadowElevation = 8.dp,
-                            backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
-                            onClick = {
-                                 showImageDialog = true
-                            }
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
 
                         OutlinedTextField(
                             value = uiState.username,
