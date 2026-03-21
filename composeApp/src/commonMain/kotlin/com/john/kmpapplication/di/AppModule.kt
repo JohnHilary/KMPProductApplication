@@ -59,7 +59,7 @@ val appModule = module {
             }
         }
     }
-    single(named(CLIENT_2)) {
+    factory (named(CLIENT_2)) {
         val tokenManager = get<TokenManager>()
 
         HttpClient {
