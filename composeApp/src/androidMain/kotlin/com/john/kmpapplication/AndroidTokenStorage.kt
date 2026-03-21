@@ -24,8 +24,10 @@ class AndroidTokenStorage(
     }
 
     override suspend fun clearToken() {
-        dataStore.edit { it.remove(accessTokenKey) }
-        dataStore.edit { it.remove(refreshTokenKey) }
+        dataStore.edit { preferences ->
+            preferences.remove(accessTokenKey)
+            preferences.remove(refreshTokenKey)
+        }
     }
 
     override suspend fun saveRefreshToken(token: String) {
