@@ -157,7 +157,7 @@ class UserFormViewModel(private val userRepository: UserRepository) : ViewModel(
                     is ApiResult.Error -> throw Exception(response.message)
                     is ApiResult.Exception -> throw response.throwable
                     is ApiResult.Success -> {
-                        userRepository.insertUser(profileResponse = response.data)
+                        userRepository.insertUser(userResponse = response.data)
                         setLoading(false)
                         _uiEffect.send(UserFormUiEffect.NavigateToProfile)
                     }
@@ -247,7 +247,7 @@ class UserFormViewModel(private val userRepository: UserRepository) : ViewModel(
                     is ApiResult.Error -> throw Exception(response.message)
                     is ApiResult.Exception -> throw response.throwable
                     is ApiResult.Success -> {
-                        userRepository.insertUser(profileResponse = response.data)
+                        userRepository.insertUser(userResponse = response.data)
                         setLoading(false)
                         _uiEffect.send(UserFormUiEffect.NavigateToProfile)
                     }

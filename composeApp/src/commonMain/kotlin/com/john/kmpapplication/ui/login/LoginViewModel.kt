@@ -112,7 +112,7 @@ class LoginViewModel(private val repository: UserRepository) : ViewModel() {
             is ApiResult.Error -> throw Exception(result.message)
             is ApiResult.Exception -> throw result.throwable
             is ApiResult.Success -> {
-                repository.insertUser(profileResponse = result.data)
+                repository.insertUser(userResponse = result.data)
                 setLoading(false)
                 _uiEffect.send(LoginUiEffect.NavigateBack)
             }
