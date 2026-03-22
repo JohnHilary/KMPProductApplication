@@ -2,7 +2,7 @@ package com.john.kmpapplication.domain
 
 import com.john.kmpapplication.data.EmailCheckRequest
 import com.john.kmpapplication.data.LoginRequest
-import com.john.kmpapplication.data.SignUpRequest
+import com.john.kmpapplication.data.UserRequest
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.MultiPartFormDataContent
@@ -20,10 +20,10 @@ class UserService(
 
     suspend fun getProfile() = client.get("/api/v1/auth/profile")
 
-    suspend fun signUp(signUpRequest: SignUpRequest) =
+    suspend fun signUp(userRequest: UserRequest) =
         client.post("/api/v1/users/") {
             contentType(ContentType.Application.Json)
-            setBody(signUpRequest)
+            setBody(userRequest)
         }
 
     suspend fun uploadFile(imageBytes: ByteArray) = client.post("/api/v1/files/upload") {
@@ -44,9 +44,9 @@ class UserService(
         setBody(emailCheckRequest)
     }
 
-    suspend fun updateUser(id: Int, signUpRequest: SignUpRequest) = client.put("/api/v1/users/${id}") {
+    suspend fun updateUser(id: Int, userRequest: UserRequest) = client.put("/api/v1/users/${id}") {
         contentType(ContentType.Application.Json)
-        setBody(signUpRequest)
+        setBody(userRequest)
     }
 
 
