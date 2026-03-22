@@ -26,8 +26,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
 import com.john.kmpapplication.LocalImagePicker
 import com.john.kmpapplication.PickerType
@@ -56,7 +54,6 @@ fun UserFormScreen(
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     var passwordVisible by retain { mutableStateOf(false) }
-    val lifecycleOwner = LocalLifecycleOwner.current
     var showImageDialog by retain { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
@@ -64,10 +61,8 @@ fun UserFormScreen(
 
 
 
-    LaunchedEffect(uiEffect) {
-        uiEffect?.flowWithLifecycle(
-            lifecycleOwner.lifecycle,
-        )?.collect { effect ->
+    LaunchedEffect(Unit) {
+        uiEffect?.collect { effect ->
             when (effect) {
                 UserFormUiEffect.NavigateToLogin -> navController.navigate(LoginScreen) {
                     popUpTo(UserFormScreen()) {

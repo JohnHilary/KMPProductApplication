@@ -44,14 +44,11 @@ fun ProductScreen(
     onEvent: (ProductUiEvent) -> Unit = {}
 ) {
 
-    val lifecycleOwner = LocalLifecycleOwner.current
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(uiEffect) {
-        uiEffect?.flowWithLifecycle(
-            lifecycleOwner.lifecycle,
-        )?.collect { effect ->
+    LaunchedEffect(Unit) {
+        uiEffect?.collect { effect ->
             when (effect) {
                 ProductUiEffect.NavigateBack -> navController.navigateUp()
                 is ProductUiEffect.ShowSnackbar -> {

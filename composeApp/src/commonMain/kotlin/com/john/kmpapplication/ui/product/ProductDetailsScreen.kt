@@ -17,9 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.john.kmpapplication.ui.BaseScreen
@@ -41,15 +39,12 @@ fun ProductDetailsScreen(
     onEvent: (ProductDetailUiEvent) -> Unit = {},
 ) {
 
-    val lifecycleOwner = LocalLifecycleOwner.current
     val snackbarHostState = remember { SnackbarHostState() }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
 
-    LaunchedEffect(uiEffect) {
-        uiEffect?.flowWithLifecycle(
-            lifecycleOwner.lifecycle
-        )?.collect { effect ->
+    LaunchedEffect(Unit) {
+        uiEffect?.collect { effect ->
             when (effect) {
                 ProductDetailUiEffect.NavigateBack -> navController.navigateUp()
                 is ProductDetailUiEffect.ShowSnackbar -> {

@@ -51,12 +51,9 @@ fun MyProfileScreen(
     onEvent: (ProfileUiEvent) -> Unit = {},
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
-    val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(uiEffect) {
-        uiEffect?.flowWithLifecycle(
-            lifecycleOwner.lifecycle,
-        )?.collect { effect ->
+    LaunchedEffect(Unit) {
+        uiEffect?.collect { effect ->
             when (effect) {
                 is ProfileUiEffect.ShowSnackbar -> {
                     val result = snackbarHostState.showSnackbar(
