@@ -5,7 +5,7 @@ import com.john.kmpapplication.data.EmailCheckResponse
 import com.john.kmpapplication.data.FileUploadResponse
 import com.john.kmpapplication.data.LoginResponse
 import com.john.kmpapplication.data.UserResponse
-import com.john.kmpapplication.data.SignUpRequest
+import com.john.kmpapplication.data.ProfileResponse
 import com.john.kmpapplication.data.TokenManager
 import com.john.kmpapplication.data.remote.ApiResult
 import com.john.kmpapplication.data.remote.handleApi
@@ -31,9 +31,9 @@ class UserRepository(
         }
     }
 
-    suspend fun signUp(signUpRequest: SignUpRequest): ApiResult<UserResponse> {
+    suspend fun signUp(userRequest: UserRequest): ApiResult<ProfileResponse> {
         return handleApi {
-            userService.signUp(signUpRequest)
+            userService.signUp(userRequest)
         }
     }
 
@@ -72,9 +72,9 @@ class UserRepository(
         }
     }
 
-    suspend fun updateUser(id: Int, signUpRequest: SignUpRequest): ApiResult<UserResponse> {
+    suspend fun updateUser(id: Int, userRequest: UserRequest): ApiResult<ProfileResponse> {
         return handleApi {
-            userService.updateUser(id, signUpRequest)
+            userService.updateUser(id, userRequest)
         }
     }
 
