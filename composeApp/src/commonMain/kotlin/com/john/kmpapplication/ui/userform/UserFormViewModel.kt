@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.john.kmpapplication.data.EmailCheckRequest
 import com.john.kmpapplication.data.EmailCheckResponse
-import com.john.kmpapplication.data.SignUpRequest
+import com.john.kmpapplication.data.UserRequest
 import com.john.kmpapplication.data.remote.ApiResult
 import com.john.kmpapplication.domain.UserRepository
 import kotlinx.coroutines.Dispatchers
@@ -147,13 +147,13 @@ class UserFormViewModel(private val userRepository: UserRepository) : ViewModel(
         viewModelScope.launch {
             try {
                 setLoading(true)
-                val signUpRequest = SignUpRequest(
+                val userRequest = UserRequest(
                     avatar = _uiState.value.image,
                     name = _uiState.value.username,
                     email = _uiState.value.email,
                     password = _uiState.value.password
                 )
-                when (val response = userRepository.signUp(signUpRequest)) {
+                when (val response = userRepository.signUp(userRequest)) {
                     is ApiResult.Error -> throw Exception(response.message)
                     is ApiResult.Exception -> throw response.throwable
                     is ApiResult.Success -> {
@@ -235,7 +235,7 @@ class UserFormViewModel(private val userRepository: UserRepository) : ViewModel(
         viewModelScope.launch {
             setLoading(true)
 
-            val signUpRequest = SignUpRequest(
+            val userRequest = UserRequest(
                 _uiState.value.image,
                 _uiState.value.email,
                 _uiState.value.username,
@@ -243,7 +243,7 @@ class UserFormViewModel(private val userRepository: UserRepository) : ViewModel(
             )
             try {
                 when (val response =
-                    userRepository.updateUser(id = _uiState.value.userId, signUpRequest = signUpRequest)) {
+                    userRepository.updateUser(id = _uiState.value.userId, userRequest = userRequest)) {
                     is ApiResult.Error -> throw Exception(response.message)
                     is ApiResult.Exception -> throw response.throwable
                     is ApiResult.Success -> {
