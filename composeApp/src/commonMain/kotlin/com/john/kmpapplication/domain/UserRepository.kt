@@ -1,5 +1,7 @@
 package com.john.kmpapplication.domain
 
+import com.john.kmpapplication.data.EmailCheckRequest
+import com.john.kmpapplication.data.EmailCheckResponse
 import com.john.kmpapplication.data.FileUploadResponse
 import com.john.kmpapplication.data.LoginResponse
 import com.john.kmpapplication.data.ProfileResponse
@@ -64,4 +66,11 @@ class UserRepository(
     }
 
     val sessionExpiredEvent = tokenManager.logoutEvent
+
+    suspend fun checkIfEmailExists(emailCheckRequest: EmailCheckRequest): ApiResult<EmailCheckResponse> {
+        return handleApi {
+            userService.checkIfEmailExists(emailCheckRequest)
+        }
+    }
+
 }

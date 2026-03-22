@@ -1,5 +1,6 @@
 package com.john.kmpapplication.domain
 
+import com.john.kmpapplication.data.EmailCheckRequest
 import com.john.kmpapplication.data.LoginRequest
 import com.john.kmpapplication.data.SignUpRequest
 import io.ktor.client.*
@@ -37,4 +38,10 @@ class UserService(
             )
         )
     }
+
+    suspend fun checkIfEmailExists(emailCheckRequest: EmailCheckRequest) = client.post("/api/v1/users/is-available") {
+        contentType(ContentType.Application.Json)
+        setBody(emailCheckRequest)
+    }
+
 }

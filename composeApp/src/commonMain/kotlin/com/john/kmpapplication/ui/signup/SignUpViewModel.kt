@@ -2,14 +2,16 @@ package com.john.kmpapplication.ui.signup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.john.kmpapplication.data.EmailCheckRequest
+import com.john.kmpapplication.data.EmailCheckResponse
 import com.john.kmpapplication.data.SignUpRequest
 import com.john.kmpapplication.data.remote.ApiResult
 import com.john.kmpapplication.domain.UserRepository
+import com.john.kmpapplication.util.AppUtils.isValidEmail
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class SignUpViewModel(private val userRepository: UserRepository) : ViewModel() {
@@ -19,11 +21,48 @@ class SignUpViewModel(private val userRepository: UserRepository) : ViewModel() 
     private val _uiEffect = Channel<SignUpUiEffect>()
     val uiEffect = _uiEffect.receiveAsFlow()
 
+    init {
+        observeEmail()
+    }
 
     private fun setLoading(isLoading: Boolean) {
         _uiState.update {
             it.copy(isLoading = isLoading)
         }
+    }
+
+    @OptIn(FlowPreview::class)
+    private fun observeEmail() {
+        uiState
+            .map { it.email }
+            .debounce(300)
+            .distinctUntilChanged()
+            .onEach { email ->
+                if (email.isNotBlank()) setLoading(true)
+            }
+            .map { email ->
+                if (email.isBlank()) null else checkIfEmailExists(email)
+            }
+            .flowOn(Dispatchers.Default)
+            .onEach { result ->
+                setLoading(false)
+                if (result == null) return@onEach
+                _uiState.update { state ->
+                    when (result) {
+                        is ApiResult.Success -> {
+                            val isAvailable = result.data.isAvailable
+                            state.copy(emailError = if (isAvailable) null else "Email is already in use.")
+                        }
+                        is ApiResult.Error -> {
+                            state.copy(emailError = result.message)
+                        }
+                        is ApiResult.Exception -> {
+                            state.copy(emailError = null)
+                        }
+                    }
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
 
@@ -104,7 +143,7 @@ class SignUpViewModel(private val userRepository: UserRepository) : ViewModel() 
         }
     }
 
-    private fun uploadImage(image: ByteArray?){
+    private fun uploadImage(image: ByteArray?) {
         viewModelScope.launch {
             try {
                 if (image == null) {
@@ -134,8 +173,6 @@ class SignUpViewModel(private val userRepository: UserRepository) : ViewModel() 
     }
 
 
-
-
     private fun onImageChange(image: String) {
         _uiState.update {
             it.copy(image = image)
@@ -143,19 +180,24 @@ class SignUpViewModel(private val userRepository: UserRepository) : ViewModel() 
     }
     private fun onEmailChanged(email: String) {
         _uiState.update {
-            it.copy(email = email)
+            it.copy(email = email, emailError = null)
         }
     }
 
     private fun onPasswordChanged(password: String) {
         _uiState.update {
-            it.copy(password = password)
+            it.copy(password = password, passwordError = null)
         }
     }
 
     private fun onUsernameChanged(username: String) {
         _uiState.update {
-            it.copy(username = username)
+            it.copy(username = username, usernameError = null)
         }
+    }
+
+    private suspend fun checkIfEmailExists(email: String) : ApiResult<EmailCheckResponse> {
+        val checkRequest = EmailCheckRequest(email = email)
+       return  userRepository.checkIfEmailExists(checkRequest)
     }
 }

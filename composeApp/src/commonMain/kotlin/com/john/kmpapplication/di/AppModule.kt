@@ -14,7 +14,7 @@ import com.john.kmpapplication.ui.login.LoginViewModel
 import com.john.kmpapplication.ui.product.ProductDetailViewModel
 import com.john.kmpapplication.ui.product.ProductViewModel
 import com.john.kmpapplication.ui.profile.ProfileViewModel
-import com.john.kmpapplication.util.CLIENT_2
+import com.john.kmpapplication.util.Constant.CLIENT_2
 import io.ktor.client.*
 import io.ktor.client.call.body
 import io.ktor.client.plugins.*
