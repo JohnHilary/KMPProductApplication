@@ -9,7 +9,7 @@ import com.john.kmpapplication.domain.ProductService
 import com.john.kmpapplication.domain.ProductRepository
 import com.john.kmpapplication.domain.UserRepository
 import com.john.kmpapplication.domain.UserService
-import com.john.kmpapplication.ui.signup.SignUpViewModel
+import com.john.kmpapplication.ui.userform.UserFormViewModel
 import com.john.kmpapplication.ui.login.LoginViewModel
 import com.john.kmpapplication.ui.product.ProductDetailViewModel
 import com.john.kmpapplication.ui.product.ProductViewModel
@@ -101,10 +101,7 @@ val appModule = module {
                             null
                         }
                     }
-                    sendWithoutRequest { request ->
-                        val path = request.url.encodedPath
-                        !path.contains("/auth/login") || !path.contains("/auth/refresh-token")
-                    }
+
                 }
             }
             defaultRequest {
@@ -141,6 +138,6 @@ val appModule = module {
     factory { get<AppDatabase>().userDao() }
     viewModel { ProfileViewModel(get()) }
     factory { UserRepository(get(), get(),get()) }
-    viewModel { SignUpViewModel(get()) }
+    viewModel { UserFormViewModel(get()) }
 
 }

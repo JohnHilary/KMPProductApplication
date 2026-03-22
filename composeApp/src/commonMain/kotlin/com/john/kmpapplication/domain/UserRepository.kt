@@ -73,4 +73,10 @@ class UserRepository(
         }
     }
 
+    suspend fun updateUser(id: Int,signUpRequest: SignUpRequest): ApiResult<ProfileResponse> {
+        return handleApi {
+            userService.updateUser(id,signUpRequest)
+        }
+    }
+
 }

@@ -1,4 +1,4 @@
-package com.john.kmpapplication.ui.signup
+package com.john.kmpapplication.ui.userform
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,22 +7,48 @@ import com.john.kmpapplication.data.EmailCheckResponse
 import com.john.kmpapplication.data.SignUpRequest
 import com.john.kmpapplication.data.remote.ApiResult
 import com.john.kmpapplication.domain.UserRepository
-import com.john.kmpapplication.util.AppUtils.isValidEmail
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-class SignUpViewModel(private val userRepository: UserRepository) : ViewModel() {
+class UserFormViewModel(private val userRepository: UserRepository) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(SignUpUiState())
-    val uiState = _uiState.asStateFlow()
-    private val _uiEffect = Channel<SignUpUiEffect>()
+    private val _uiState = MutableStateFlow(UserFormUiState())
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val uiState = userRepository.getUserFlow()
+        .take(1)
+        .map { user ->
+            if (user == null) {
+                UserFormUiState()
+            } else {
+                UserFormUiState(
+                    isLoading = false,
+                    userId = user.id,
+                    username = user.username,
+                    email = user.email,
+                    image = user.avatar,
+                    password = user.password
+                )
+            }
+        }
+        .flatMapLatest { initialState ->
+            _uiState.value = initialState
+            _uiState
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = UserFormUiState(isLoading = true)
+        )
+    private val _uiEffect = Channel<UserFormUiEffect>()
     val uiEffect = _uiEffect.receiveAsFlow()
 
     init {
-        observeEmail()
+       // observeEmail()
     }
 
     private fun setLoading(isLoading: Boolean) {
@@ -66,24 +92,25 @@ class SignUpViewModel(private val userRepository: UserRepository) : ViewModel() 
     }
 
 
-    fun onEvent(event: SignUpUiEvent) {
+    fun onEvent(event: UserFormUiEvent) {
         when (event) {
-            is SignUpUiEvent.OnEmailChanged -> onEmailChanged(event.email)
-            SignUpUiEvent.OnLoginButtonClick -> {
+            is UserFormUiEvent.OnEmailChanged -> onEmailChanged(event.email)
+            UserFormUiEvent.OnLoginButtonClick -> {
                 viewModelScope.launch {
-                    _uiEffect.send(SignUpUiEffect.NavigateToLogin)
+                    _uiEffect.send(UserFormUiEffect.NavigateToLogin)
                 }
             }
 
-            is SignUpUiEvent.OnPasswordChanged -> onPasswordChanged(event.password)
+            is UserFormUiEvent.OnPasswordChanged -> onPasswordChanged(event.password)
 
-            is SignUpUiEvent.OnUsernameChanged -> onUsernameChanged(event.username)
-            SignUpUiEvent.OnSignUpButtonClick -> validateAndSignUp()
-            is SignUpUiEvent.OnImageUploadClicked -> uploadImage(event.image)
+            is UserFormUiEvent.OnUsernameChanged -> onUsernameChanged(event.username)
+
+            is UserFormUiEvent.OnImageUploadClicked -> uploadImage(event.image)
+            is UserFormUiEvent.OnSubmitClick -> validateAndSubmit(submitType = event.submitType)
         }
     }
 
-    private fun validateAndSignUp() {
+    private fun validateAndSubmit(submitType: SubmitType) {
         var isValid = true
         var usernameError: String? = null
         var emailError: String? = null
@@ -110,7 +137,10 @@ class SignUpViewModel(private val userRepository: UserRepository) : ViewModel() 
             passwordError = passwordError
         )
         if (!isValid) return
-        signUp()
+        when (submitType) {
+            SubmitType.SIGNUP -> signUp()
+            SubmitType.UPDATE -> updateUser()
+        }
     }
 
     private fun signUp() {
@@ -129,13 +159,13 @@ class SignUpViewModel(private val userRepository: UserRepository) : ViewModel() 
                     is ApiResult.Success -> {
                         userRepository.insertUser(profileResponse = response.data)
                         setLoading(false)
-                        _uiEffect.send(SignUpUiEffect.NavigateToProfile)
+                        _uiEffect.send(UserFormUiEffect.NavigateToProfile)
                     }
                 }
             } catch (e: Exception) {
                 setLoading(false)
                 _uiEffect.send(
-                    SignUpUiEffect.ShowSnackbar(
+                    UserFormUiEffect.ShowSnackbar(
                         e.message ?: "Something went wrong",
                     )
                 )
@@ -148,7 +178,7 @@ class SignUpViewModel(private val userRepository: UserRepository) : ViewModel() 
             try {
                 if (image == null) {
                     _uiEffect.send(
-                        SignUpUiEffect.ShowSnackbar("Image is required")
+                        UserFormUiEffect.ShowSnackbar("Image is required")
                     )
                     return@launch
                 }
@@ -164,7 +194,7 @@ class SignUpViewModel(private val userRepository: UserRepository) : ViewModel() 
             } catch (e: Exception) {
                 setLoading(false)
                 _uiEffect.send(
-                    SignUpUiEffect.ShowSnackbar(
+                    UserFormUiEffect.ShowSnackbar(
                         e.message ?: "Something went wrong",
                     )
                 )
@@ -196,8 +226,41 @@ class SignUpViewModel(private val userRepository: UserRepository) : ViewModel() 
         }
     }
 
-    private suspend fun checkIfEmailExists(email: String) : ApiResult<EmailCheckResponse> {
+    private suspend fun checkIfEmailExists(email: String): ApiResult<EmailCheckResponse> {
         val checkRequest = EmailCheckRequest(email = email)
-       return  userRepository.checkIfEmailExists(checkRequest)
+        return userRepository.checkIfEmailExists(checkRequest)
     }
+
+    private fun updateUser() {
+        viewModelScope.launch {
+            setLoading(true)
+
+            val signUpRequest = SignUpRequest(
+                _uiState.value.image,
+                _uiState.value.email,
+                _uiState.value.username,
+                _uiState.value.password
+            )
+            try {
+                when (val response =
+                    userRepository.updateUser(id = _uiState.value.userId, signUpRequest = signUpRequest)) {
+                    is ApiResult.Error -> throw Exception(response.message)
+                    is ApiResult.Exception -> throw response.throwable
+                    is ApiResult.Success -> {
+                        userRepository.insertUser(profileResponse = response.data)
+                        setLoading(false)
+                        _uiEffect.send(UserFormUiEffect.NavigateToProfile)
+                    }
+                }
+            } catch (e: Exception) {
+                setLoading(false)
+                _uiEffect.send(
+                    UserFormUiEffect.ShowSnackbar(
+                        e.message ?: "Something went wrong",
+                    )
+                )
+            }
+        }
+    }
+
 }

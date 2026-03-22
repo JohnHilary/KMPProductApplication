@@ -44,4 +44,10 @@ class UserService(
         setBody(emailCheckRequest)
     }
 
+    suspend fun updateUser(id: Int, signUpRequest: SignUpRequest) = client.put("/api/v1/users/${id}") {
+        contentType(ContentType.Application.Json)
+        setBody(signUpRequest)
+    }
+
+
 }

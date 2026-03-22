@@ -70,6 +70,12 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
                     }
                 }
             }
+
+            ProfileUiEvent.NavigateToUserFormScreen -> {
+                viewModelScope.launch {
+                    _uiEffect.send(ProfileUiEffect.NavigateToUserFormScreen)
+                }
+            }
         }
     }
 

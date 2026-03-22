@@ -9,14 +9,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.john.kmpapplication.ui.signup.SignUpScreen
-import com.john.kmpapplication.ui.signup.SignUpViewModel
+import androidx.navigation.toRoute
+import com.john.kmpapplication.ui.userform.UserFormScreen
+import com.john.kmpapplication.ui.userform.UserFormViewModel
 import com.john.kmpapplication.ui.login.LoginScreen
 import com.john.kmpapplication.ui.login.LoginViewModel
 import com.john.kmpapplication.ui.product.*
 import com.john.kmpapplication.ui.profile.MyProfile
 import com.john.kmpapplication.ui.profile.MyProfileScreen
 import com.john.kmpapplication.ui.profile.ProfileViewModel
+import com.john.kmpapplication.ui.userform.SubmitType
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -76,13 +78,15 @@ fun NavigationHost() {
                 viewModel.onEvent(it)
             }
         }
-        composable<SignUpScreen> {
-            val viewModel = koinViewModel<SignUpViewModel>()
+        composable<UserFormScreen> { backStackEntry ->
+            val userFormScreen = backStackEntry.toRoute<UserFormScreen>()
+            val viewModel = koinViewModel<UserFormViewModel>()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-            SignUpScreen(
+            UserFormScreen(
                 navController = navController,
                 uiState = uiState,
                 uiEffect = viewModel.uiEffect,
+                submitType = SubmitType.from(userFormScreen.type)
             ) {
                 viewModel.onEvent(it)
             }

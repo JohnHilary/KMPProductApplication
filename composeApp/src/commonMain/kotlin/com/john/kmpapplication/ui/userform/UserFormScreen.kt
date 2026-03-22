@@ -1,4 +1,4 @@
-package com.john.kmpapplication.ui.signup
+package com.john.kmpapplication.ui.userform
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -43,16 +43,17 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-data object SignUpScreen
+data class UserFormScreen(val type: Int = SubmitType.SIGNUP.value)
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignUpScreen(
+fun UserFormScreen(
     navController: NavController,
-    uiState: SignUpUiState,
-    uiEffect: Flow<SignUpUiEffect>?,
-    onEvent: (SignUpUiEvent) -> Unit,
+    uiState: UserFormUiState,
+    uiEffect: Flow<UserFormUiEffect>?,
+    submitType: SubmitType = SubmitType.SIGNUP,
+    onEvent: (UserFormUiEvent) -> Unit,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     var passwordVisible by retain { mutableStateOf(false) }
@@ -70,13 +71,13 @@ fun SignUpScreen(
             Lifecycle.State.STARTED
         )?.collect { effect ->
             when (effect) {
-                SignUpUiEffect.NavigateToLogin -> navController.navigate(LoginScreen) {
-                    popUpTo(SignUpScreen) {
+                UserFormUiEffect.NavigateToLogin -> navController.navigate(LoginScreen) {
+                    popUpTo(UserFormScreen()) {
                         inclusive = true
                     }
                 }
 
-                is SignUpUiEffect.ShowSnackbar -> {
+                is UserFormUiEffect.ShowSnackbar -> {
                     val result = snackbarHostState.showSnackbar(
                         message = effect.message,
                         actionLabel = effect.actionLabel
@@ -84,10 +85,10 @@ fun SignUpScreen(
 
                 }
 
-                SignUpUiEffect.NavigateBack -> navController.navigateUp()
-                SignUpUiEffect.NavigateToProfile -> {
+                UserFormUiEffect.NavigateBack -> navController.navigateUp()
+                UserFormUiEffect.NavigateToProfile -> {
                     navController.navigate(MyProfile) {
-                        popUpTo(SignUpScreen) {
+                        popUpTo(UserFormScreen()) {
                             inclusive = true
                         }
                     }
@@ -101,11 +102,14 @@ fun SignUpScreen(
         snackbarHostState = snackbarHostState,
         scrollBehavior = scrollBehavior,
         title = {
-                Text(
-                    text = "Create Account",
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+            Text(
+                text = when (submitType) {
+                    SubmitType.SIGNUP -> "Create Account"
+                    SubmitType.UPDATE -> "Update Account"
+                },
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
 
         },
         navigationIcon = {
@@ -168,7 +172,7 @@ fun SignUpScreen(
 
                         OutlinedTextField(
                             value = uiState.username,
-                            onValueChange = { onEvent(SignUpUiEvent.OnUsernameChanged(it)) },
+                            onValueChange = { onEvent(UserFormUiEvent.OnUsernameChanged(it)) },
                             label = { Text("Username") },
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
@@ -182,11 +186,11 @@ fun SignUpScreen(
                                     )
                                 }
                             }
-                            )
+                        )
 
                         OutlinedTextField(
                             value = uiState.email,
-                            onValueChange = { onEvent(SignUpUiEvent.OnEmailChanged(it)) },
+                            onValueChange = { onEvent(UserFormUiEvent.OnEmailChanged(it)) },
                             label = { Text("Email") },
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
@@ -204,7 +208,7 @@ fun SignUpScreen(
 
                         OutlinedTextField(
                             value = uiState.password,
-                            onValueChange = { onEvent(SignUpUiEvent.OnPasswordChanged(it)) },
+                            onValueChange = { onEvent(UserFormUiEvent.OnPasswordChanged(it)) },
                             label = { Text("Password") },
                             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                             modifier = Modifier.fillMaxWidth(),
@@ -234,38 +238,44 @@ fun SignUpScreen(
                         )
 
                         Button(
-                            onClick = { onEvent(SignUpUiEvent.OnSignUpButtonClick) },
+                            onClick = { onEvent(UserFormUiEvent.OnSubmitClick(submitType = submitType)) },
                             modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
                         ) {
-                            Text("Register")
+                            Text(
+                                when (submitType) {
+                                    SubmitType.SIGNUP -> "Register"
+                                    SubmitType.UPDATE -> "Update"
+                                }
+                            )
                         }
                         Spacer(Modifier.height(8.dp))
-
-                        Row(
-                            horizontalArrangement = Arrangement.Center,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            val annotatedText = buildAnnotatedString {
-                                append("Already have an account? ")
-                                pushLink(
-                                    LinkAnnotation.Clickable(
-                                        tag = "login",
-                                        linkInteractionListener = {
-                                            onEvent(SignUpUiEvent.OnLoginButtonClick)
-                                        }
+                        if (submitType == SubmitType.SIGNUP ) {
+                            Row(
+                                horizontalArrangement = Arrangement.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                val annotatedText = buildAnnotatedString {
+                                    append("Already have an account? ")
+                                    pushLink(
+                                        LinkAnnotation.Clickable(
+                                            tag = "login",
+                                            linkInteractionListener = {
+                                                onEvent(UserFormUiEvent.OnLoginButtonClick)
+                                            }
+                                        )
                                     )
-                                )
-                                withStyle(
-                                    style = SpanStyle(
-                                        color = MaterialTheme.colorScheme.primary,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                ) {
-                                    append("Log in")
+                                    withStyle(
+                                        style = SpanStyle(
+                                            color = MaterialTheme.colorScheme.primary,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    ) {
+                                        append("Log in")
+                                    }
+                                    pop()
                                 }
-                                pop()
+                                Text(text = annotatedText)
                             }
-                            Text(text = annotatedText)
                         }
                     }
                 }
@@ -280,7 +290,7 @@ fun SignUpScreen(
                             type = PickerType.GALLERY,
                             onResult = {
                                 showImageDialog = false
-                                onEvent(SignUpUiEvent.OnImageUploadClicked(it?.copyOf()))
+                                onEvent(UserFormUiEvent.OnImageUploadClicked(it?.copyOf()))
                             })
                     },
                     onCameraSelect = {
@@ -288,11 +298,21 @@ fun SignUpScreen(
                             type = PickerType.CAMERA,
                             onResult = {
                                 showImageDialog = false
-                                onEvent(SignUpUiEvent.OnImageUploadClicked(it?.copyOf()))
+                                onEvent(UserFormUiEvent.OnImageUploadClicked(it?.copyOf()))
                             })
 
                     })
             }
         }
+    }
+}
+
+
+enum class SubmitType(val value: Int) {
+    SIGNUP(1),
+    UPDATE(2);
+
+    companion object {
+        fun from(value: Int) = entries.find { it.value == value } ?: SIGNUP
     }
 }

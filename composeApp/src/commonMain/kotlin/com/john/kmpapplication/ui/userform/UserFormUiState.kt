@@ -1,7 +1,8 @@
-package com.john.kmpapplication.ui.signup
+package com.john.kmpapplication.ui.userform
 
-data class SignUpUiState(
+data class UserFormUiState(
     val isLoading: Boolean = false,
+    val userId: Int = -1,
     val image : String = "",
     val username: String = "",
     val email: String = "",

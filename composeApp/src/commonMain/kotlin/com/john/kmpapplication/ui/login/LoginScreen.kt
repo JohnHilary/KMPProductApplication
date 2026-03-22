@@ -34,7 +34,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.john.kmpapplication.ui.BaseScreen
 import com.john.kmpapplication.ui.component.FullScreenLoader
-import com.john.kmpapplication.ui.signup.SignUpScreen
+import com.john.kmpapplication.ui.userform.UserFormScreen
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 
@@ -58,7 +58,7 @@ fun LoginScreen(
             Lifecycle.State.STARTED
         )?.collect { effect ->
             when (effect) {
-                LoginUiEffect.NavigateToSignUp -> navController.navigate(SignUpScreen)
+                LoginUiEffect.NavigateToSignUp -> navController.navigate(UserFormScreen())
                 is LoginUiEffect.ShowSnackbar -> {
                     val result = snackbarHostState.showSnackbar(
                         message = effect.message,

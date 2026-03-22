@@ -10,6 +10,6 @@ data class UserEntity(
     val email: String,
     val username: String,
     val avatar: String,
-   val password: String,
+    val password: String,
     val role: String
 )

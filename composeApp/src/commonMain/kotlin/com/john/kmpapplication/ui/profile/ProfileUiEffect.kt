@@ -5,5 +5,5 @@ sealed interface ProfileUiEffect {
     data class ShowSnackbar(
         val message: String, val actionLabel: String? = null
     ) : ProfileUiEffect
-
+    data object NavigateToUserFormScreen : ProfileUiEffect
 }

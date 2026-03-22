@@ -32,6 +32,8 @@ import com.john.kmpapplication.ui.component.dialog.AppDialog
 import com.john.kmpapplication.ui.component.dialog.DialogState
 import com.john.kmpapplication.ui.login.LoginScreen
 import com.john.kmpapplication.ui.navigation.AnimatedBottomBar
+import com.john.kmpapplication.ui.userform.SubmitType
+import com.john.kmpapplication.ui.userform.UserFormScreen
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 
@@ -65,6 +67,8 @@ fun MyProfileScreen(
                     if (result == SnackbarResult.ActionPerformed) {
                     }
                 }
+
+                ProfileUiEffect.NavigateToUserFormScreen -> navController.navigate(UserFormScreen(type = SubmitType.UPDATE.value))
             }
         }
     }
@@ -153,7 +157,7 @@ fun MyProfileScreen(
                             title = user.username,
                             description = "@Test",
                             onClick = {
-
+                                 onEvent(ProfileUiEvent.NavigateToUserFormScreen)
                             })
                         HorizontalDivider(
                             modifier = Modifier.padding(horizontal = 16.dp),
@@ -235,11 +239,10 @@ fun ProfileItem(modifier: Modifier, icon: ImageVector, title: String, descriptio
                     text = description, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            IconButton(onClick = { }) {
-                Icon(
-                    imageVector = Icons.Default.ChevronRight, contentDescription = "Logout"
-                )
-            }
+            Icon(
+                imageVector = Icons.Default.ChevronRight, contentDescription = "Logout"
+            )
         }
+
     }
 }
