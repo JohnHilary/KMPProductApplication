@@ -12,15 +12,17 @@ data class ProfileResponse(
     val name: String,
     val password: String,
     val role: String
-)
-
-fun ProfileResponse.toEntity(): UserEntity {
-    return UserEntity(
-        id = this.id,
-        email = this.email,
-        username = this.name,
-        role = this.role,
-        password = this.password,
-        avatar = this.avatar
-    )
+){
+    fun toEntity(): UserEntity {
+        return UserEntity(
+            id = this.id,
+            email = this.email,
+            username = this.name,
+            role = this.role,
+            password = this.password,
+            avatar = this.avatar
+        )
+    }
 }
+
+

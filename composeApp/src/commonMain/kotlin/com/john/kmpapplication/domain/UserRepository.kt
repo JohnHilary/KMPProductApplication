@@ -9,7 +9,6 @@ import com.john.kmpapplication.data.SignUpRequest
 import com.john.kmpapplication.data.TokenManager
 import com.john.kmpapplication.data.remote.ApiResult
 import com.john.kmpapplication.data.remote.handleApi
-import com.john.kmpapplication.data.toEntity
 import com.john.kmpapplication.db.UserDao
 import com.john.kmpapplication.db.UserEntity
 import kotlinx.coroutines.flow.Flow
@@ -73,9 +72,9 @@ class UserRepository(
         }
     }
 
-    suspend fun updateUser(id: Int,signUpRequest: SignUpRequest): ApiResult<ProfileResponse> {
+    suspend fun updateUser(id: Int, signUpRequest: SignUpRequest): ApiResult<ProfileResponse> {
         return handleApi {
-            userService.updateUser(id,signUpRequest)
+            userService.updateUser(id, signUpRequest)
         }
     }
 
