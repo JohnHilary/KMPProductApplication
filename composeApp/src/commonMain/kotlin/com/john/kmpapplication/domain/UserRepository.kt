@@ -4,8 +4,8 @@ import com.john.kmpapplication.data.EmailCheckRequest
 import com.john.kmpapplication.data.EmailCheckResponse
 import com.john.kmpapplication.data.FileUploadResponse
 import com.john.kmpapplication.data.LoginResponse
-import com.john.kmpapplication.data.UserResponse
-import com.john.kmpapplication.data.UserRequest
+import com.john.kmpapplication.data.ProfileResponse
+import com.john.kmpapplication.data.SignUpRequest
 import com.john.kmpapplication.data.TokenManager
 import com.john.kmpapplication.data.remote.ApiResult
 import com.john.kmpapplication.data.remote.handleApi
@@ -25,15 +25,15 @@ class UserRepository(
         }
     }
 
-    suspend fun getProfile(): ApiResult<UserResponse> {
+    suspend fun getProfile(): ApiResult<ProfileResponse> {
         return handleApi {
             userService.getProfile()
         }
     }
 
-    suspend fun signUp(userRequest: UserRequest): ApiResult<UserResponse> {
+    suspend fun signUp(signUpRequest: SignUpRequest): ApiResult<ProfileResponse> {
         return handleApi {
-            userService.signUp(userRequest)
+            userService.signUp(signUpRequest)
         }
     }
 
@@ -47,8 +47,8 @@ class UserRepository(
         return userDao.getUser()
     }
 
-    suspend fun insertUser(userResponse: UserResponse) {
-        val entity = userResponse.toEntity()
+    suspend fun insertUser(profileResponse: ProfileResponse) {
+        val entity = profileResponse.toEntity()
         userDao.insertUser(entity)
     }
 
@@ -72,9 +72,9 @@ class UserRepository(
         }
     }
 
-    suspend fun updateUser(id: Int, userRequest: UserRequest): ApiResult<UserResponse> {
+    suspend fun updateUser(id: Int, signUpRequest: SignUpRequest): ApiResult<ProfileResponse> {
         return handleApi {
-            userService.updateUser(id, userRequest)
+            userService.updateUser(id, signUpRequest)
         }
     }
 
