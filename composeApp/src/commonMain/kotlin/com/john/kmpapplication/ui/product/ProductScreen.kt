@@ -51,7 +51,6 @@ fun ProductScreen(
     LaunchedEffect(uiEffect) {
         uiEffect?.flowWithLifecycle(
             lifecycleOwner.lifecycle,
-            Lifecycle.State.STARTED
         )?.collect { effect ->
             when (effect) {
                 ProductUiEffect.NavigateBack -> navController.navigateUp()

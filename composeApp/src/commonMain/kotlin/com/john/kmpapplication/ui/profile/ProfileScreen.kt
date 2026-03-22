@@ -56,7 +56,6 @@ fun MyProfileScreen(
     LaunchedEffect(uiEffect) {
         uiEffect?.flowWithLifecycle(
             lifecycleOwner.lifecycle,
-            Lifecycle.State.STARTED
         )?.collect { effect ->
             when (effect) {
                 is ProfileUiEffect.ShowSnackbar -> {

@@ -26,7 +26,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
@@ -68,7 +67,6 @@ fun UserFormScreen(
     LaunchedEffect(uiEffect) {
         uiEffect?.flowWithLifecycle(
             lifecycleOwner.lifecycle,
-            Lifecycle.State.STARTED
         )?.collect { effect ->
             when (effect) {
                 UserFormUiEffect.NavigateToLogin -> navController.navigate(LoginScreen) {

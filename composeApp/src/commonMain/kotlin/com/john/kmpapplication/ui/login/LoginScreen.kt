@@ -55,7 +55,6 @@ fun LoginScreen(
     LaunchedEffect(uiEffect) {
         uiEffect?.flowWithLifecycle(
             lifecycleOwner.lifecycle,
-            Lifecycle.State.STARTED
         )?.collect { effect ->
             when (effect) {
                 LoginUiEffect.NavigateToSignUp -> navController.navigate(UserFormScreen())
