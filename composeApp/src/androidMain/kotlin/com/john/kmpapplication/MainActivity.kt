@@ -14,15 +14,11 @@ import org.koin.core.context.unloadKoinModules
 import org.koin.dsl.module
 
 class MainActivity : ComponentActivity() {
-    val imagePicker: ImagePicker by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        loadKoinModules(module {
-            single<ComponentActivity> { this@MainActivity }
-        })
-        imagePicker
+        val imagePicker = ImagePicker(this)
         setContent {
             CompositionLocalProvider(LocalImagePicker provides imagePicker) {
                 App()
