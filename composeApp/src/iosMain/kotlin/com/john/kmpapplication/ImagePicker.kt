@@ -4,7 +4,7 @@ package com.john.kmpapplication
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
-import platform.Foundation.NSItemProviderReadingProtocol
+import platform.Foundation.NSData
 import platform.PhotosUI.PHPickerConfiguration
 import platform.PhotosUI.PHPickerFilter
 import platform.PhotosUI.PHPickerResult
@@ -58,26 +58,26 @@ private class GalleryDelegate(
     private val onResult: (ByteArray?) -> Unit
 ) : NSObject(), PHPickerViewControllerDelegateProtocol {
 
-    override fun picker(picker: PHPickerViewController, didFinishPicking: List<*>) {
-        picker.dismissViewControllerAnimated(true) {
-            PickerRuntimeStore.activeDelegate = null
-        }
+    override fun picker(
+        picker: PHPickerViewController,
+        didFinishPicking: List<*>
+    ) {
+        picker.dismissViewControllerAnimated(true, null)
 
         val result = didFinishPicking.firstOrNull() as? PHPickerResult
         val provider = result?.itemProvider
 
-        val imageClass = UIImage as Any
-        val nsItemReadingProtocol = imageClass as NSItemProviderReadingProtocol
+        if (provider?.hasItemConformingToTypeIdentifier("public.image") == true) {
 
-        if (provider?.canLoadObjectOfClass(nsItemReadingProtocol) == true) {
-            provider.loadObjectOfClass(nsItemReadingProtocol) { data, _ ->
-                val uiImage = data as? UIImage
-                val bytes = uiImage?.let { imageToByteArray(it) }
+            provider.loadDataRepresentationForTypeIdentifier("public.image") { data, error ->
+
+                val byteArray = data?.toByteArray()
 
                 dispatch_async(dispatch_get_main_queue()) {
-                    onResult(bytes)
+                    onResult(byteArray)
                 }
             }
+
         } else {
             onResult(null)
         }
@@ -121,4 +121,12 @@ private class CameraDelegate(
 
 private object PickerRuntimeStore {
     var activeDelegate: Any? = null
+}
+@OptIn(ExperimentalForeignApi::class)
+fun NSData.toByteArray(): ByteArray {
+    return ByteArray(length.toInt()).apply {
+        usePinned {
+            memcpy(it.addressOf(0), bytes, length)
+        }
+    }
 }
