@@ -31,7 +31,6 @@ fun AppImage(
     shape: Shape = RoundedCornerShape(16.dp),
     shadowElevation: Dp = 0.dp,
     backgroundColor: Color = Color.Transparent,
-    onClick: (() -> Unit)? = null
 ) {
     Surface(
         modifier = modifier
@@ -40,7 +39,6 @@ fun AppImage(
         shape = shape,
         shadowElevation = shadowElevation,
         color = backgroundColor,
-        onClick = { onClick?.invoke() }
     ) {
         imageUrl?.let {
             KamelImage(
