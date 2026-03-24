@@ -16,6 +16,7 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.john.kmpapplication.ui.BottomNavigationItem
+import com.john.kmpapplication.ui.product.ProductScreen
 
 @Composable
 fun AnimatedBottomBar(
@@ -38,12 +39,14 @@ fun AnimatedBottomBar(
             NavigationBarItem(
                 selected = isSelected,
                 onClick = {
-                    navController.navigate(item.route) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
+                    if (item.route == ProductScreen) {
+                        navController.navigate(item.route) {
+                            popUpTo(0) { inclusive = true }
                         }
-                        launchSingleTop = true
-                        restoreState = true
+                    } else {
+                        navController.navigate(item.route) {
+                            popUpTo(ProductScreen) { inclusive = false }
+                        }
                     }
                 },
                 label = { Text(item.title) },
