@@ -4,6 +4,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.john.kmpapplication.util.StringValue
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
@@ -20,10 +21,10 @@ class DialogHostState : DialogState {
 
     suspend fun showDialog(
         icon: ImageVector,
-        title: String,
-        message: String,
-        positiveButton: String,
-        negativeButton: String? = null,
+        title: StringValue,
+        message: StringValue,
+        positiveButton: StringValue,
+        negativeButton: StringValue? = null,
     ): DialogResult = mutex.withLock {
         suspendCancellableCoroutine { continuation ->
             val visuals = object : DialogVisuals {

@@ -8,6 +8,14 @@ import androidx.lifecycle.viewModelScope
 import com.john.kmpapplication.domain.UserRepository
 import com.john.kmpapplication.ui.component.dialog.DialogHostState
 import com.john.kmpapplication.ui.component.dialog.DialogResult
+import com.john.kmpapplication.util.StringValue
+import kmpapplication.composeapp.generated.resources.Res
+import kmpapplication.composeapp.generated.resources.cancel
+import kmpapplication.composeapp.generated.resources.logout
+import kmpapplication.composeapp.generated.resources.logout_message
+import kmpapplication.composeapp.generated.resources.logout_success
+import kmpapplication.composeapp.generated.resources.ok
+import kmpapplication.composeapp.generated.resources.success
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -59,10 +67,10 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
                 viewModelScope.launch {
                     val result = dialogState.showDialog(
                         icon = Icons.AutoMirrored.Filled.Logout,
-                        title = "Logout",
-                        message = "Are you sure you want to log out?",
-                        positiveButton = "Cancel",
-                        negativeButton = "Logout"
+                        title = StringValue.StringRes(Res.string.logout),
+                        message = StringValue.StringRes(Res.string.logout_message),
+                        positiveButton = StringValue.StringRes(Res.string.cancel),
+                        negativeButton = StringValue.StringRes(Res.string.logout)
                     )
 
                     if (result == DialogResult.Negative) {
@@ -91,9 +99,9 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
             setLoading(false)
             dialogState.showDialog(
                 icon = Icons.Default.CheckCircle,
-                title = "Success",
-                message = "Successfully logged out",
-                positiveButton = "Ok",
+                title = StringValue.StringRes(Res.string.success),
+                message = StringValue.StringRes(Res.string.logout_success),
+                positiveButton = StringValue.StringRes(Res.string.ok),
             )
         }
     }

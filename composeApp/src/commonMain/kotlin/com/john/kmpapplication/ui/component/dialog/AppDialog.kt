@@ -34,7 +34,7 @@ fun AppDialog(
             title = {
                 Text(
                     modifier = Modifier.fillMaxWidth(),
-                    text = visuals.title,
+                    text = visuals.title.asString(),
                     textAlign = TextAlign.Center,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold
@@ -42,19 +42,19 @@ fun AppDialog(
             },
             text = {
                 Text(
-                    modifier = Modifier.fillMaxWidth(), text = visuals.message, fontSize = 18.sp,
+                    modifier = Modifier.fillMaxWidth(), text = visuals.message.asString(), fontSize = 18.sp,
                     textAlign = TextAlign.Center
                 )
             },
             confirmButton = {
                 Button(onClick =data::onPositive) {
-                    Text(text = visuals.positiveButton, fontSize = 14.sp)
+                    Text(text = visuals.positiveButton.asString(), fontSize = 14.sp)
                 }
             },
             dismissButton = {
                 visuals.negativeButton?.let {
                     TextButton(onClick = data::onNegative) {
-                        Text(text = it, fontSize = 14.sp)
+                        Text(text = it.asString(), fontSize = 14.sp)
                     }
                 }
             }

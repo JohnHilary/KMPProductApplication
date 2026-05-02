@@ -1,0 +1,9 @@
+<resources>
+    <string name="logout_message">Are you sure you want to log out?</string>
+    <string name="cancel">Cancel</string>
+    <string name="logout">Logout</string>
+    <string name="success">Success</string>
+    <string name="logout_success">Successfully logged out</string>
+    <string name="ok">OK</string>
+    <string name="session_expired">Session Expired</string>
+</resources>
