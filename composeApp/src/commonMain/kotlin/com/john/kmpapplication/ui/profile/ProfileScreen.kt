@@ -192,18 +192,8 @@ fun MyProfileScreen(
                     }
                 }
             }
-            dialogState?.currentDialogData?.value?.let { data ->
-                val visuals = data.visuals
-                AppDialog(
-                    title = visuals.title,
-                    message = visuals.message,
-                    icon = visuals.icon,
-                    confirmLabel = visuals.positiveButton,
-                    dismissLabel = visuals.negativeButton,
-                    onConfirm = data::onPositive,
-                    onDismiss = data::onNegative
-                )
-            }
+
+            AppDialog(dialogState = dialogState)
             FullScreenLoader(isLoading = uiState.isLoading)
         }
     }
