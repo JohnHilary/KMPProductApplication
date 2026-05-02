@@ -102,7 +102,7 @@ fun MyProfileScreen(
                     shadowElevation = 8.dp
                 ) {
                     IconButton(onClick = {
-                        onEvent(ProfileUiEvent.LogoutIconClicked)
+                        onEvent(ProfileUiEvent.LogoutClicked)
                     }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Logout, contentDescription = "Logout"

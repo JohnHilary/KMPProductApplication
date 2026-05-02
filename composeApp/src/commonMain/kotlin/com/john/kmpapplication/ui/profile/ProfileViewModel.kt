@@ -55,7 +55,7 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
 
     fun onEvent(uiEvent: ProfileUiEvent) {
         when (uiEvent) {
-            is ProfileUiEvent.LogoutIconClicked -> {
+            is ProfileUiEvent.LogoutClicked -> {
                 viewModelScope.launch {
                     val result = dialogState.showDialog(
                         icon = Icons.AutoMirrored.Filled.Logout,
