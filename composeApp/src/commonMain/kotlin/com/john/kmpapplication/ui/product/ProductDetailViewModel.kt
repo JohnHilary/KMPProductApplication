@@ -18,7 +18,8 @@ class ProductDetailViewModel(
     private val route = savedStateHandle.toRoute<ProductDetailScreen>()
 
     val id = route.productId
-    private val _uiState: MutableStateFlow<ProductDetailUiState> = MutableStateFlow(ProductDetailUiState())
+    private val _uiState: MutableStateFlow<ProductDetailUiState> =
+        MutableStateFlow(ProductDetailUiState())
     val uiState = _uiState.asStateFlow()
 
     private val _uiEffect = Channel<ProductDetailUiEffect>()
@@ -43,24 +44,35 @@ class ProductDetailViewModel(
 
     private fun getProduct(id: Int?) {
         viewModelScope.launch {
-            try {
-                setLoading(true)
-                when (val result = repository.getProduct(id)) {
-                    is ApiResult.Success -> _uiState.update {
-                        it.copy(product = result.data, isLoading = false, noData = result.data as? Product? == null)
-                    }
-                    is ApiResult.Error -> throw Exception(result.message)
-                    is ApiResult.Exception -> throw result.throwable
-                }
-            } catch (e: Exception) {
-                setLoading(false)
-                _uiEffect.send(
-                    ProductDetailUiEffect.ShowSnackbar(
-                        e.message ?: "Something went wrong",
-                        actionLabel = "Retry"
+            setLoading(true)
+            when (val result = repository.getProduct(id)) {
+                is ApiResult.Success -> _uiState.update {
+                    it.copy(
+                        product = result.data,
+                        isLoading = false,
+                        noData = result.data as? Product? == null
                     )
-                )
-                _uiState.update { it.copy(noData = true) }
+                }
+                is ApiResult.Error -> {
+                    setLoading(false)
+                    _uiEffect.send(
+                        ProductDetailUiEffect.ShowSnackbar(
+                            result.message,
+                            actionLabel = "Retry"
+                        )
+                    )
+                    _uiState.update { it.copy(noData = true) }
+                }
+                is ApiResult.Exception -> {
+                    setLoading(false)
+                    _uiEffect.send(
+                        ProductDetailUiEffect.ShowSnackbar(
+                            result.throwable.message ?: "Something went wrong",
+                            actionLabel = "Retry"
+                        )
+                    )
+                    _uiState.update { it.copy(noData = true) }
+                }
             }
 
         }
