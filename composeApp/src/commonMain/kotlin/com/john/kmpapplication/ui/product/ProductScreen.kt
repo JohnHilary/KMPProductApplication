@@ -108,8 +108,7 @@ fun ProductScreen(
 
             (uiState.allProducts.isNotEmpty()) -> {
                 LazyColumn(
-                    modifier = modifier,
-                    contentPadding = PaddingValues(
+                    modifier = modifier.padding(
                         top = it.calculateTopPadding(),
                         bottom = (it.calculateBottomPadding() + 16.dp),
                         start = 16.dp,
