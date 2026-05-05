@@ -4,11 +4,13 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.john.kmpapplication.data.Product
 import com.john.kmpapplication.data.remote.ApiResult
 import com.john.kmpapplication.domain.ProductRepository
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ProductDetailViewModel(
@@ -19,7 +21,7 @@ class ProductDetailViewModel(
 
     val id = route.productId
     private val _uiState: MutableStateFlow<ProductDetailUiState> =
-        MutableStateFlow(ProductDetailUiState())
+        MutableStateFlow(ProductDetailUiState.UnInitialized)
     val uiState = _uiState.asStateFlow()
 
     private val _uiEffect = Channel<ProductDetailUiEffect>()
@@ -36,42 +38,34 @@ class ProductDetailViewModel(
 
     }
 
-    private fun setLoading(isLoading: Boolean) {
-        _uiState.update {
-            it.copy(isLoading = isLoading)
-        }
+    private fun setUiState(uiState: ProductDetailUiState = ProductDetailUiState.UnInitialized) {
+        _uiState.update { uiState }
     }
 
     private fun getProduct(id: Int?) {
         viewModelScope.launch {
-            setLoading(true)
+            setUiState(uiState = ProductDetailUiState.Loading)
             when (val result = repository.getProduct(id)) {
-                is ApiResult.Success -> _uiState.update {
-                    it.copy(
-                        product = result.data,
-                        isLoading = false,
-                        noData = result.data as? Product? == null
-                    )
-                }
+                is ApiResult.Success -> setUiState(uiState = ProductDetailUiState.ShowData(product = result.data))
+
                 is ApiResult.Error -> {
-                    setLoading(false)
                     _uiEffect.send(
                         ProductDetailUiEffect.ShowSnackbar(
                             result.message,
                             actionLabel = "Retry"
                         )
                     )
-                    _uiState.update { it.copy(noData = true) }
+                    setUiState(uiState = ProductDetailUiState.NoData)
                 }
+
                 is ApiResult.Exception -> {
-                    setLoading(false)
                     _uiEffect.send(
                         ProductDetailUiEffect.ShowSnackbar(
                             result.throwable.message ?: "Something went wrong",
                             actionLabel = "Retry"
                         )
                     )
-                    _uiState.update { it.copy(noData = true) }
+                    setUiState(uiState = ProductDetailUiState.NoData)
                 }
             }
 

@@ -2,8 +2,11 @@ package com.john.kmpapplication.ui.product
 
 import com.john.kmpapplication.data.Product
 
-data class ProductDetailUiState(
-    val isLoading: Boolean = false,
-    val product: Product? = null,
-    val noData: Boolean = false
-)
+sealed interface ProductDetailUiState {
+    data object Loading : ProductDetailUiState
+    data class ShowData(val product: Product, val isLoading: Boolean = false) :
+        ProductDetailUiState
+
+    data object NoData : ProductDetailUiState
+    data object UnInitialized : ProductDetailUiState
+}

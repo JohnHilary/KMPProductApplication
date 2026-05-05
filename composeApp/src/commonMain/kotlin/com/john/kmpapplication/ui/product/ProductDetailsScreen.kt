@@ -45,7 +45,7 @@ data class ProductDetailScreen(val productId: Int?)
 @Composable
 fun ProductDetailsScreen(
     navController: NavController = rememberNavController(),
-    uiState: ProductDetailUiState = ProductDetailUiState(),
+    uiState: ProductDetailUiState = ProductDetailUiState.UnInitialized,
     uiEffect: Flow<ProductDetailUiEffect>? = null,
     onEvent: (ProductDetailUiEvent) -> Unit = {},
 ) {
@@ -84,37 +84,44 @@ fun ProductDetailsScreen(
     }, snackbarHostState = snackbarHostState, scrollBehavior = scrollBehavior, title = {
         Text(text = "Product Details", fontWeight = FontWeight.Bold)
     }) {
-        if (uiState.noData) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = "No Data available")
+        when (uiState) {
+            ProductDetailUiState.Loading -> FullScreenLoader(isLoading = true)
 
-            }
-        } else {
-            Column(
-                modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(
-                    top = (it.calculateTopPadding() + 16.dp),
-                    start = 16.dp,
-                    end = 16.dp,
-                    bottom = (it.calculateBottomPadding() + 16.dp)
-                )
-            ) {
-                uiState.product?.let { product ->
-                    Spacer(modifier = Modifier.height(12.dp))
-                    AppImage(
-                        imageUrl = product.image, modifier = Modifier.fillMaxWidth().background(Color.LightGray)
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = product.title, fontSize = 20.sp)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = product.price.toString(), fontSize = 16.sp)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = product.description)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = product.category ?: "-")
+            ProductDetailUiState.NoData -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(text = "No Data available")
                 }
             }
-        }
-        FullScreenLoader(isLoading = uiState.isLoading)
-    }
 
+            is ProductDetailUiState.ShowData -> {
+                Column(
+                    modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(
+                        top = (it.calculateTopPadding() + 16.dp),
+                        start = 16.dp,
+                        end = 16.dp,
+                        bottom = (it.calculateBottomPadding() + 16.dp)
+                    )
+                ) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    AppImage(
+                        imageUrl = uiState.product.image,
+                        modifier = Modifier.fillMaxWidth().background(Color.LightGray)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = uiState.product.title, fontSize = 20.sp)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = uiState.product.price.toString(), fontSize = 16.sp)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = uiState.product.description)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = uiState.product.category)
+
+                }
+                FullScreenLoader(isLoading = uiState.isLoading)
+            }
+
+            ProductDetailUiState.UnInitialized -> Unit
+        }
+
+    }
 }
