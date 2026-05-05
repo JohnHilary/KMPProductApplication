@@ -34,13 +34,10 @@ fun NavigationHost() {
             val viewModel = koinViewModel<ProductViewModel>()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             ProductScreen(
-                modifier = Modifier.fillMaxSize(),
                 uiState = uiState,
                 navController = navController,
                 uiEffect = viewModel.uiEffect,
-                onEvent = {
-                    viewModel.onEvent(it)
-                }
+                onEvent = viewModel::onEvent
             )
         }
 
@@ -51,7 +48,7 @@ fun NavigationHost() {
                 navController = navController,
                 uiState = uiState,
                 uiEffect = viewModel.uiEffect,
-                onEvent = { viewModel.onEvent(it) }
+                onEvent = viewModel::onEvent
             )
         }
 
@@ -62,8 +59,7 @@ fun NavigationHost() {
                 navController = navController,
                 uiState = uiState,
                 uiEffect = viewModel.uiEffect,
-                dialogState = viewModel.dialogState,
-                onEvent = { viewModel.onEvent(it) }
+                onEvent = viewModel::onEvent
             )
         }
 
@@ -74,9 +70,8 @@ fun NavigationHost() {
                 navController = navController,
                 uiState = uiState,
                 uiEffect = viewModel.uiEffect,
-            ) {
-                viewModel.onEvent(it)
-            }
+                onEvent = viewModel::onEvent
+            )
         }
         composable<UserFormScreen> { backStackEntry ->
             val userFormScreen = backStackEntry.toRoute<UserFormScreen>()
@@ -86,11 +81,9 @@ fun NavigationHost() {
                 navController = navController,
                 uiState = uiState,
                 uiEffect = viewModel.uiEffect,
-                submitType = SubmitType.from(userFormScreen.type)
-            ) {
-                viewModel.onEvent(it)
-            }
-
+                submitType = SubmitType.from(userFormScreen.type),
+                onEvent = viewModel::onEvent
+            )
         }
     }
 }

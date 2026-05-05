@@ -16,44 +16,50 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun AppDialog(
-    dialogState: DialogState?
+fun <T> AppDialog(
+    dialogState: DialogRequest<T>?,
+    onResult: (T?) -> Unit
 ) {
-    dialogState?.currentDialogData?.value?.let { data ->
-        val visuals = data.visuals
+    dialogState?.let { data ->
         AlertDialog(
-            onDismissRequest = data::onPositive,
+            onDismissRequest = { onResult.invoke(data.negativeResult) },
             icon = {
-                Icon(
-                    modifier = Modifier.size(48.dp),
-                    imageVector = visuals.icon,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
-                )
+                data.icon?.let {
+                    Icon(
+                        modifier = Modifier.size(48.dp),
+                        imageVector = it,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
             },
             title = {
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = visuals.title.asString(),
-                    textAlign = TextAlign.Center,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                data.title?.asString()?.let {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = it,
+                        textAlign = TextAlign.Center,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             },
             text = {
-                Text(
-                    modifier = Modifier.fillMaxWidth(), text = visuals.message.asString(), fontSize = 18.sp,
-                    textAlign = TextAlign.Center
-                )
+                data.message?.asString()?.let {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(), text = it, fontSize = 18.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
             },
             confirmButton = {
-                Button(onClick =data::onPositive) {
-                    Text(text = visuals.positiveButton.asString(), fontSize = 14.sp)
+                Button(onClick = { onResult.invoke(data.positiveResult) }) {
+                    data.positiveText?.let { Text(text = it.asString(), fontSize = 14.sp) }
                 }
             },
             dismissButton = {
-                visuals.negativeButton?.let {
-                    TextButton(onClick = data::onNegative) {
+                data.negativeText?.let {
+                    TextButton(onClick = { onResult.invoke(data.negativeResult) }) {
                         Text(text = it.asString(), fontSize = 14.sp)
                     }
                 }

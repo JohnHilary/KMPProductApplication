@@ -51,7 +51,6 @@ import kotlinx.serialization.Serializable
 @Preview
 @Composable
 fun ProductScreen(
-    modifier: Modifier = Modifier,
     navController: NavController = rememberNavController(),
     uiState: ProductUiState = ProductUiState(),
     uiEffect: Flow<ProductUiEffect>? = null,
@@ -108,12 +107,12 @@ fun ProductScreen(
 
             (uiState.allProducts.isNotEmpty()) -> {
                 LazyColumn(
-                    modifier = modifier.padding(
+                    modifier = Modifier.padding(
                         top = it.calculateTopPadding(),
                         bottom = (it.calculateBottomPadding() + 16.dp),
                         start = 16.dp,
                         end = 16.dp
-                    ),
+                    ).fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
 

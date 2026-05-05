@@ -6,9 +6,10 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.john.kmpapplication.domain.UserRepository
-import com.john.kmpapplication.ui.component.dialog.DialogHostState
-import com.john.kmpapplication.ui.component.dialog.DialogResult
-import com.john.kmpapplication.util.StringValue
+import com.john.kmpapplication.ui.component.dialog.DialogRequest
+import com.john.kmpapplication.ui.userform.SubmitType
+import com.john.kmpapplication.ui.userform.UserFormScreen
+import com.john.kmpapplication.util.StringValue.*
 import kmpapplication.composeapp.generated.resources.Res
 import kmpapplication.composeapp.generated.resources.cancel
 import kmpapplication.composeapp.generated.resources.logout
@@ -46,8 +47,6 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
     private val _uiEffect = Channel<ProfileUiEffect>()
     val uiEffect = _uiEffect.receiveAsFlow()
 
-    val dialogState = DialogHostState()
-
     init {
         observeLogoutEvent()
     }
@@ -64,26 +63,21 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
     fun onEvent(uiEvent: ProfileUiEvent) {
         when (uiEvent) {
             is ProfileUiEvent.LogoutClicked -> {
-                viewModelScope.launch {
-                    val result = dialogState.showDialog(
-                        icon = Icons.AutoMirrored.Filled.Logout,
-                        title = StringValue.StringRes(Res.string.logout),
-                        message = StringValue.StringRes(Res.string.logout_message),
-                        positiveButton = StringValue.StringRes(Res.string.cancel),
-                        negativeButton = StringValue.StringRes(Res.string.logout)
+                    showDialog(
+                        dialogRequest = DialogRequest(
+                            icon = Icons.AutoMirrored.Filled.Logout,
+                            title = StringRes(Res.string.logout),
+                            message = StringRes(Res.string.logout_message),
+                            positiveText = StringRes(Res.string.logout),
+                            negativeText = StringRes(Res.string.cancel),
+                            positiveResult = ProfileUiEvent.Logout,
+                        )
                     )
-
-                    if (result == DialogResult.Negative) {
-                        logout()
-                    }
-                }
             }
-
             ProfileUiEvent.NavigateToUserFormScreen -> {
-                viewModelScope.launch {
-                    _uiEffect.send(ProfileUiEffect.NavigateToUserFormScreen)
-                }
+                _uiEffect.trySend(ProfileUiEffect.Navigate(screen = UserFormScreen(type = SubmitType.UPDATE.value)))
             }
+            ProfileUiEvent.Logout -> logout()
         }
     }
 
@@ -97,13 +91,21 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
             delay(1000)
             userRepository.logout()
             setLoading(false)
-            dialogState.showDialog(
-                icon = Icons.Default.CheckCircle,
-                title = StringValue.StringRes(Res.string.success),
-                message = StringValue.StringRes(Res.string.logout_success),
-                positiveButton = StringValue.StringRes(Res.string.ok),
-            )
+               showDialog(
+                    dialogRequest = DialogRequest(
+                        icon = Icons.Default.CheckCircle,
+                        title = StringRes(Res.string.success),
+                        message = StringRes(Res.string.logout_success),
+                        positiveText = StringRes(Res.string.ok),
+                    )
+                )
         }
+    }
+
+    private fun showDialog(dialogRequest: DialogRequest<ProfileUiEvent>) {
+        _uiEffect.trySend(
+            ProfileUiEffect.ShowDialog(dialogRequest = dialogRequest)
+        )
     }
 
 
