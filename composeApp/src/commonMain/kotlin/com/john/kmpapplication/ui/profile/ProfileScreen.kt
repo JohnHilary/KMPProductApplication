@@ -81,13 +81,11 @@ fun MyProfileScreen(
                         actionLabel = effect.actionLabel
                     )
                     if (result == SnackbarResult.ActionPerformed) {
+                        effect.onAction?.let { onEvent(it) }
                     }
                 }
-
                 is ProfileUiEffect.Navigate -> navController.navigate(effect.screen)
-                is ProfileUiEffect.ShowDialog -> {
-                    dialogState = effect.dialogRequest
-                }
+                is ProfileUiEffect.ShowDialog -> dialogState = effect.dialogRequest
             }
         }
     }
