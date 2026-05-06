@@ -69,9 +69,7 @@ fun MyProfileScreen(
     onEvent: (ProfileUiEvent) -> Unit = {},
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
-    var dialogState by retain {
-        mutableStateOf<DialogRequest<ProfileUiEvent>?>(null)
-    }
+
     LaunchedEffect(Unit) {
         uiEffect?.collect { effect ->
             when (effect) {
@@ -85,7 +83,6 @@ fun MyProfileScreen(
                     }
                 }
                 is ProfileUiEffect.Navigate -> navController.navigate(effect.screen)
-                is ProfileUiEffect.ShowDialog -> dialogState = effect.dialogRequest
             }
         }
     }
@@ -214,9 +211,9 @@ fun MyProfileScreen(
                 }
             }
 
-            AppDialog(dialogState = dialogState, onResult = { event ->
-                dialogState = null
+            AppDialog(dialogState = uiState.dialog, onResult = { event ->
                 event?.let { event -> onEvent(event) }
+                onEvent(ProfileUiEvent.DismissDialog)
             })
             FullScreenLoader(isLoading = uiState.isLoading)
         }

@@ -4,4 +4,5 @@ sealed interface ProfileUiEvent {
     data object LogoutClicked : ProfileUiEvent
     data object NavigateToUserFormScreen : ProfileUiEvent
     data object Logout: ProfileUiEvent
+    data object DismissDialog : ProfileUiEvent
 }
