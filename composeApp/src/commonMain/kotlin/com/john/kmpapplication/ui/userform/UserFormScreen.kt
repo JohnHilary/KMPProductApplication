@@ -1,7 +1,17 @@
 package com.john.kmpapplication.ui.userform
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,9 +22,25 @@ import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.retain.retain
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,15 +58,9 @@ import com.john.kmpapplication.PickerType
 import com.john.kmpapplication.ui.BaseScreen
 import com.john.kmpapplication.ui.component.AppImage
 import com.john.kmpapplication.ui.component.FullScreenLoader
+import com.john.kmpapplication.ui.component.Screen
 import com.john.kmpapplication.ui.component.dialog.ImageSourceDialog
-import com.john.kmpapplication.ui.login.LoginScreen
-import com.john.kmpapplication.ui.profile.MyProfile
 import kotlinx.coroutines.flow.Flow
-import kotlinx.serialization.Serializable
-
-
-@Serializable
-data class UserFormScreen(val type: Int = SubmitType.SIGNUP.value)
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,8 +84,8 @@ fun UserFormScreen(
     LaunchedEffect(Unit) {
         uiEffect?.collect { effect ->
             when (effect) {
-                UserFormUiEffect.NavigateToLogin -> navController.navigate(LoginScreen) {
-                    popUpTo(UserFormScreen()) {
+                UserFormUiEffect.NavigateToLogin -> navController.navigate(Screen.LoginScreen) {
+                    popUpTo(Screen.UserFormScreen()) {
                         inclusive = true
                     }
                 }
@@ -80,8 +100,8 @@ fun UserFormScreen(
 
                 UserFormUiEffect.NavigateBack -> navController.navigateUp()
                 UserFormUiEffect.NavigateToProfile -> {
-                    navController.navigate(MyProfile) {
-                        popUpTo(UserFormScreen()) {
+                    navController.navigate(Screen.MyProfile) {
+                        popUpTo(Screen.UserFormScreen()) {
                             inclusive = true
                         }
                     }

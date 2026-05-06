@@ -45,15 +45,16 @@ import androidx.navigation.NavController
 import com.john.kmpapplication.ui.BaseScreen
 import com.john.kmpapplication.ui.component.AppImage
 import com.john.kmpapplication.ui.component.FullScreenLoader
+import com.john.kmpapplication.ui.component.Screen
 import com.john.kmpapplication.ui.component.dialog.AppDialog
-import com.john.kmpapplication.ui.login.LoginScreen
+import com.john.kmpapplication.ui.component.dialog.DialogRequest
 import com.john.kmpapplication.ui.navigation.AnimatedBottomBar
+import com.john.kmpapplication.util.StringValue.StringRes
+import kmpapplication.composeapp.generated.resources.Res
+import kmpapplication.composeapp.generated.resources.cancel
+import kmpapplication.composeapp.generated.resources.logout
+import kmpapplication.composeapp.generated.resources.logout_message
 import kotlinx.coroutines.flow.Flow
-import kotlinx.serialization.Serializable
-
-
-@Serializable
-data object MyProfile {}
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -98,7 +99,18 @@ fun MyProfileScreen(
                     shadowElevation = 8.dp
                 ) {
                     IconButton(onClick = {
-                        onEvent(ProfileUiEvent.LogoutClicked)
+                        onEvent(
+                            ProfileUiEvent.ShowDialog(
+                                dialog = DialogRequest(
+                                    icon = Icons.AutoMirrored.Filled.Logout,
+                                    title = StringRes(Res.string.logout),
+                                    message = StringRes(Res.string.logout_message),
+                                    positiveText = StringRes(Res.string.logout),
+                                    negativeText = StringRes(Res.string.cancel),
+                                    positiveResult = ProfileUiEvent.Logout,
+                                )
+                            )
+                        )
                     }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Logout, contentDescription = "Logout"
@@ -166,7 +178,7 @@ fun MyProfileScreen(
                             title = user.username,
                             description = "@Test",
                             onClick = {
-                                 onEvent(ProfileUiEvent.NavigateToUserFormScreen)
+                                 onEvent(ProfileUiEvent.Navigate(screen = Screen.UserFormScreen()))
                             })
                         HorizontalDivider(
                             modifier = Modifier.padding(horizontal = 16.dp),
@@ -201,7 +213,7 @@ fun MyProfileScreen(
             } else {
                 if (!uiState.isLoading) {
                     NotLoggedInUI {
-                        navController.navigate(LoginScreen)
+                        navController.navigate(Screen.LoginScreen)
                     }
                 }
             }

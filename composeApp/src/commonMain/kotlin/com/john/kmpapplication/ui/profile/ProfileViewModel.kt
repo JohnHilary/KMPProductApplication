@@ -64,23 +64,10 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
 
     fun onEvent(uiEvent: ProfileUiEvent) {
         when (uiEvent) {
-            is ProfileUiEvent.LogoutClicked -> {
-                setDialog(
-                    dialog = DialogRequest(
-                        icon = Icons.AutoMirrored.Filled.Logout,
-                        title = StringRes(Res.string.logout),
-                        message = StringRes(Res.string.logout_message),
-                        positiveText = StringRes(Res.string.logout),
-                        negativeText = StringRes(Res.string.cancel),
-                        positiveResult = ProfileUiEvent.Logout,
-                    )
-                )
-            }
-            ProfileUiEvent.NavigateToUserFormScreen -> {
-                _uiEffect.trySend(Navigate(screen = UserFormScreen(type = SubmitType.UPDATE.value)))
-            }
+            is ProfileUiEvent.Navigate -> _uiEffect.trySend(Navigate(screen = uiEvent.screen))
             ProfileUiEvent.Logout -> logout()
             ProfileUiEvent.DismissDialog -> setDialog(dialog = null)
+            is ProfileUiEvent.ShowDialog -> setDialog(dialog = uiEvent.dialog)
         }
     }
 

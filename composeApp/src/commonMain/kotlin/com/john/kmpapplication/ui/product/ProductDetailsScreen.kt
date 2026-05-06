@@ -35,10 +35,7 @@ import com.john.kmpapplication.ui.BaseScreen
 import com.john.kmpapplication.ui.component.AppImage
 import com.john.kmpapplication.ui.component.FullScreenLoader
 import kotlinx.coroutines.flow.Flow
-import kotlinx.serialization.Serializable
 
-@Serializable
-data class ProductDetailScreen(val productId: Int?)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview

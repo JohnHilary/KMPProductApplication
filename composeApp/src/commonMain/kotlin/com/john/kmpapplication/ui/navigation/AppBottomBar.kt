@@ -5,7 +5,11 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Box
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -13,10 +17,9 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.john.kmpapplication.ui.BottomNavigationItem
-import com.john.kmpapplication.ui.product.ProductScreen
+import com.john.kmpapplication.ui.component.Screen
 
 @Composable
 fun AnimatedBottomBar(
@@ -39,13 +42,13 @@ fun AnimatedBottomBar(
             NavigationBarItem(
                 selected = isSelected,
                 onClick = {
-                    if (item.route == ProductScreen) {
+                    if (item.route == Screen.ProductScreen) {
                         navController.navigate(item.route) {
                             popUpTo(0) { inclusive = true }
                         }
                     } else {
                         navController.navigate(item.route) {
-                            popUpTo(ProductScreen) { inclusive = false }
+                            popUpTo(Screen.ProductScreen) { inclusive = false }
                         }
                     }
                 },

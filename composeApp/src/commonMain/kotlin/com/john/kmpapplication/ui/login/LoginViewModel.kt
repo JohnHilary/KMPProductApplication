@@ -32,11 +32,7 @@ class LoginViewModel(private val repository: UserRepository) : ViewModel() {
             is LoginUiEvent.OnEmailChanged -> onEmailChanged(event.email)
             is LoginUiEvent.OnLoginButtonClick -> validateAndLogin(email = event.email, password = event.password)
             is LoginUiEvent.OnPasswordChanged -> onPasswordChanged(event.password)
-            LoginUiEvent.OnSignUpButtonClick -> {
-                viewModelScope.launch {
-                    _uiEffect.send(LoginUiEffect.NavigateToSignUp)
-                }
-            }
+            is LoginUiEvent.Navigate -> _uiEffect.trySend(LoginUiEffect.Navigate(screen = event.screen))
         }
 
     }

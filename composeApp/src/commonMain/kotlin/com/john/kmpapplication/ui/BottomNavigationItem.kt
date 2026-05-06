@@ -6,8 +6,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.john.kmpapplication.ui.product.ProductScreen
-import com.john.kmpapplication.ui.profile.MyProfile
+import com.john.kmpapplication.ui.component.Screen
 
 enum class BottomNavigationItem(
     val title: String,
@@ -19,12 +18,12 @@ enum class BottomNavigationItem(
         title = "Home",
         selectedIcon = Icons.Filled.Home,
         unselectedIcon = Icons.Outlined.Home,
-        route = ProductScreen,
+        route = Screen.ProductScreen,
     ),
     Profile(
         title = "Profile",
         selectedIcon = Icons.Filled.Person,
         unselectedIcon = Icons.Outlined.Person,
-        route = MyProfile,
+        route = Screen.MyProfile,
     )
 }

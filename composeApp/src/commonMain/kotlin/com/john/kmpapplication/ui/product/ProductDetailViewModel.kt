@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.john.kmpapplication.data.remote.ApiResult
 import com.john.kmpapplication.domain.ProductRepository
+import com.john.kmpapplication.ui.component.Screen
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +18,7 @@ class ProductDetailViewModel(
     private val repository: ProductRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-    private val route = savedStateHandle.toRoute<ProductDetailScreen>()
+    private val route = savedStateHandle.toRoute<Screen.ProductDetailScreen>()
 
     val id = route.productId
     private val _uiState: MutableStateFlow<ProductDetailUiState> =
