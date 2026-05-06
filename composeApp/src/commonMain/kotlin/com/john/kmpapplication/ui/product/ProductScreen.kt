@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -42,10 +41,10 @@ import com.john.kmpapplication.ui.BaseScreen
 import com.john.kmpapplication.ui.component.AppImage
 import com.john.kmpapplication.ui.component.FilterChips
 import com.john.kmpapplication.ui.component.FullScreenLoader
+import com.john.kmpapplication.ui.component.Screen
 import com.john.kmpapplication.ui.component.SearchBar
 import com.john.kmpapplication.ui.navigation.AnimatedBottomBar
 import kotlinx.coroutines.flow.Flow
-import kotlinx.serialization.Serializable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
@@ -73,7 +72,7 @@ fun ProductScreen(
                         onEvent(ProductUiEvent.LoadData)
                     }
                 }
-                is ProductUiEffect.NavigateToDetail -> navController.navigate(ProductDetailScreen(effect.id))
+                is ProductUiEffect.NavigateToDetail -> navController.navigate(Screen.ProductDetailScreen(effect.id))
             }
         }
     }
@@ -169,8 +168,7 @@ fun ProductScreen(
     }
 }
 
-@Serializable
-data object ProductScreen
+
 
 
 @Composable

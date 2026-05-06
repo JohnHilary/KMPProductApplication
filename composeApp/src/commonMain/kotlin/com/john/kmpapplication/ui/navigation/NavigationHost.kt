@@ -1,21 +1,19 @@
 package com.john.kmpapplication.ui.navigation
 
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.john.kmpapplication.ui.component.Screen
 import com.john.kmpapplication.ui.userform.UserFormScreen
 import com.john.kmpapplication.ui.userform.UserFormViewModel
 import com.john.kmpapplication.ui.login.LoginScreen
 import com.john.kmpapplication.ui.login.LoginViewModel
 import com.john.kmpapplication.ui.product.*
-import com.john.kmpapplication.ui.profile.MyProfile
 import com.john.kmpapplication.ui.profile.MyProfileScreen
 import com.john.kmpapplication.ui.profile.ProfileViewModel
 import com.john.kmpapplication.ui.userform.SubmitType
@@ -28,9 +26,9 @@ fun NavigationHost() {
 
     NavHost(
         navController = navController,
-        startDestination = ProductScreen,
+        startDestination = Screen.ProductScreen,
     ) {
-        composable<ProductScreen> {
+        composable<Screen.ProductScreen> {
             val viewModel = koinViewModel<ProductViewModel>()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             ProductScreen(
@@ -41,7 +39,7 @@ fun NavigationHost() {
             )
         }
 
-        composable<ProductDetailScreen> { _ ->
+        composable<Screen.ProductDetailScreen> { _ ->
             val viewModel = koinViewModel<ProductDetailViewModel>()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             ProductDetailsScreen(
@@ -52,7 +50,7 @@ fun NavigationHost() {
             )
         }
 
-        composable<MyProfile> {
+        composable<Screen.MyProfile> {
             val viewModel = koinViewModel<ProfileViewModel>()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             MyProfileScreen(
@@ -63,7 +61,7 @@ fun NavigationHost() {
             )
         }
 
-        composable<LoginScreen> {
+        composable<Screen.LoginScreen> {
             val viewModel = koinViewModel<LoginViewModel>()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             LoginScreen(
@@ -73,8 +71,8 @@ fun NavigationHost() {
                 onEvent = viewModel::onEvent
             )
         }
-        composable<UserFormScreen> { backStackEntry ->
-            val userFormScreen = backStackEntry.toRoute<UserFormScreen>()
+        composable<Screen.UserFormScreen> { backStackEntry ->
+            val userFormScreen = backStackEntry.toRoute<Screen.UserFormScreen>()
             val viewModel = koinViewModel<UserFormViewModel>()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             UserFormScreen(

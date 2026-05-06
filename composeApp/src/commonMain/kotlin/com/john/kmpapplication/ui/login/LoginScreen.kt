@@ -28,9 +28,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.john.kmpapplication.ui.BaseScreen
 import com.john.kmpapplication.ui.component.FullScreenLoader
-import com.john.kmpapplication.ui.userform.UserFormScreen
+import com.john.kmpapplication.ui.component.Screen
 import kotlinx.coroutines.flow.Flow
-import kotlinx.serialization.Serializable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,15 +50,13 @@ fun LoginScreen(
             lifecycleOwner.lifecycle,
         )?.collect { effect ->
             when (effect) {
-                LoginUiEffect.NavigateToSignUp -> navController.navigate(UserFormScreen())
-                is LoginUiEffect.ShowSnackbar -> {
-                    val result = snackbarHostState.showSnackbar(
+                is LoginUiEffect.ShowSnackbar -> { snackbarHostState.showSnackbar(
                         message = effect.message,
                         actionLabel = effect.actionLabel
                     )
-
                 }
                 LoginUiEffect.NavigateBack -> navController.navigateUp()
+                is LoginUiEffect.Navigate -> navController.navigate(effect.screen)
             }
         }
     }
@@ -201,7 +198,13 @@ fun LoginScreen(
                                 pushLink(
                                     LinkAnnotation.Clickable(
                                         tag = "signup",
-                                        linkInteractionListener = { onEvent(LoginUiEvent.OnSignUpButtonClick) }
+                                        linkInteractionListener = {
+                                            onEvent(
+                                                LoginUiEvent.Navigate(
+                                                    Screen.UserFormScreen()
+                                                )
+                                            )
+                                        }
                                     )
                                 )
                                 withStyle(
@@ -228,5 +231,3 @@ fun LoginScreen(
     }
 }
 
-@Serializable
-data object LoginScreen

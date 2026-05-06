@@ -38,6 +38,21 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
         observeLogoutEvent()
     }
 
+    private fun observeUser() {
+        viewModelScope.launch {
+            setLoading(isLoading = true)
+            userRepository.getUserFlow().collect { user ->
+                _uiState.update { state ->
+                    state.copy(
+                        isLoading = false,
+                        userEntity = user,
+                        isLoggedIn = user != null
+                    )
+                }
+            }
+        }
+    }
+
     private fun observeLogoutEvent() {
         viewModelScope.launch {
             userRepository.sessionExpiredEvent.collect {
@@ -82,6 +97,12 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
             ProfileUiEvent.Logout -> logout()
             ProfileUiEvent.DismissDialog -> setDialog(null)
         }
+    }
+
+    fun setDialog(
+        dialog: DialogRequest<ProfileUiEvent>?
+    ) {
+        _uiState.update { it.copy(dialog = dialog) }
     }
 
     private fun setLoading(isLoading: Boolean) {
