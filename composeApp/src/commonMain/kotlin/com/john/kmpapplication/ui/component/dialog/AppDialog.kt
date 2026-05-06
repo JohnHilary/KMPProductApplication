@@ -18,11 +18,11 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun <T> AppDialog(
     dialogState: DialogRequest<T>?,
-    onResult: (T?) -> Unit
+    onAction: (T?) -> Unit
 ) {
     dialogState?.let { data ->
         AlertDialog(
-            onDismissRequest = { onResult.invoke(data.negativeResult) },
+            onDismissRequest = { onAction.invoke(data.negativeResult) },
             icon = {
                 data.icon?.let {
                     Icon(
@@ -53,13 +53,13 @@ fun <T> AppDialog(
                 }
             },
             confirmButton = {
-                Button(onClick = { onResult.invoke(data.positiveResult) }) {
+                Button(onClick = { onAction.invoke(data.positiveResult) }) {
                     data.positiveText?.let { Text(text = it.asString(), fontSize = 14.sp) }
                 }
             },
             dismissButton = {
                 data.negativeText?.let {
-                    TextButton(onClick = { onResult.invoke(data.negativeResult) }) {
+                    TextButton(onClick = { onAction.invoke(data.negativeResult) }) {
                         Text(text = it.asString(), fontSize = 14.sp)
                     }
                 }

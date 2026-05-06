@@ -34,11 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.retain.retain
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -50,7 +46,6 @@ import com.john.kmpapplication.ui.BaseScreen
 import com.john.kmpapplication.ui.component.AppImage
 import com.john.kmpapplication.ui.component.FullScreenLoader
 import com.john.kmpapplication.ui.component.dialog.AppDialog
-import com.john.kmpapplication.ui.component.dialog.DialogRequest
 import com.john.kmpapplication.ui.login.LoginScreen
 import com.john.kmpapplication.ui.navigation.AnimatedBottomBar
 import kotlinx.coroutines.flow.Flow
@@ -69,9 +64,7 @@ fun MyProfileScreen(
     onEvent: (ProfileUiEvent) -> Unit = {},
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
-    var dialogState by retain {
-        mutableStateOf<DialogRequest<ProfileUiEvent>?>(null)
-    }
+
     LaunchedEffect(Unit) {
         uiEffect?.collect { effect ->
             when (effect) {
@@ -85,7 +78,6 @@ fun MyProfileScreen(
                     }
                 }
                 is ProfileUiEffect.Navigate -> navController.navigate(effect.screen)
-                is ProfileUiEffect.ShowDialog -> dialogState = effect.dialogRequest
             }
         }
     }
@@ -214,10 +206,13 @@ fun MyProfileScreen(
                 }
             }
 
-            AppDialog(dialogState = dialogState, onResult = { event ->
-                dialogState = null
-                event?.let { event -> onEvent(event) }
-            })
+            AppDialog(
+                dialogState = uiState.dialog,
+                onAction = { event ->
+                    onEvent(ProfileUiEvent.DismissDialog)
+                    event?.let { event -> onEvent(event) }
+                }
+            )
             FullScreenLoader(isLoading = uiState.isLoading)
         }
     }
