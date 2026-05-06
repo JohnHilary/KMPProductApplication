@@ -6,10 +6,10 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.john.kmpapplication.domain.UserRepository
+import com.john.kmpapplication.ui.component.Screen
 import com.john.kmpapplication.ui.component.dialog.DialogRequest
 import com.john.kmpapplication.ui.profile.ProfileUiEffect.Navigate
 import com.john.kmpapplication.ui.userform.SubmitType
-import com.john.kmpapplication.ui.userform.UserFormScreen
 import com.john.kmpapplication.util.StringValue.StringRes
 import kmpapplication.composeapp.generated.resources.Res
 import kmpapplication.composeapp.generated.resources.cancel
@@ -61,27 +61,14 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
             }
         }
     }
-    private fun observeUser() {
-        viewModelScope.launch {
-            setLoading(true)
-            userRepository.getUserFlow().collect { user ->
-                _uiState.update { state ->
-                    state.copy(
-                        userEntity = user,
-                        isLoggedIn = user != null
-                    )
-                }
-                setLoading(false)
-            }
-        }
-    }
+
 
 
     fun onEvent(uiEvent: ProfileUiEvent) {
         when (uiEvent) {
             is ProfileUiEvent.LogoutClicked -> {
                     setDialog(
-                        dialogRequest = DialogRequest(
+                        dialog = DialogRequest(
                             icon = Icons.AutoMirrored.Filled.Logout,
                             title = StringRes(Res.string.logout),
                             message = StringRes(Res.string.logout_message),
@@ -92,7 +79,7 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
                     )
             }
             ProfileUiEvent.NavigateToUserFormScreen -> {
-                _uiEffect.trySend(Navigate(screen = UserFormScreen(type = SubmitType.UPDATE.value)))
+                _uiEffect.trySend(Navigate(screen = Screen.UserFormScreen(type = SubmitType.UPDATE.value)))
             }
             ProfileUiEvent.Logout -> logout()
             ProfileUiEvent.DismissDialog -> setDialog(null)
@@ -116,7 +103,7 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
             delay(1000)
             setLoading(false)
                setDialog(
-                    dialogRequest = DialogRequest(
+                    dialog = DialogRequest(
                         icon = Icons.Default.CheckCircle,
                         title = StringRes(Res.string.success),
                         message = StringRes(Res.string.logout_success),
@@ -124,11 +111,6 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
                     )
                 )
         }
-    }
-
-    private fun setDialog(dialogRequest: DialogRequest<ProfileUiEvent>?) {
-        _uiState.update { it.copy(dialog = dialogRequest) }
-
     }
 
 

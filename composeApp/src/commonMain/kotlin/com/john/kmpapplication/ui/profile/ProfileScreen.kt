@@ -100,16 +100,7 @@ fun MyProfileScreen(
                 ) {
                     IconButton(onClick = {
                         onEvent(
-                            ProfileUiEvent.ShowDialog(
-                                dialog = DialogRequest(
-                                    icon = Icons.AutoMirrored.Filled.Logout,
-                                    title = StringRes(Res.string.logout),
-                                    message = StringRes(Res.string.logout_message),
-                                    positiveText = StringRes(Res.string.logout),
-                                    negativeText = StringRes(Res.string.cancel),
-                                    positiveResult = ProfileUiEvent.Logout,
-                                )
-                            )
+                            ProfileUiEvent.LogoutClicked
                         )
                     }) {
                         Icon(
@@ -178,7 +169,7 @@ fun MyProfileScreen(
                             title = user.username,
                             description = "@Test",
                             onClick = {
-                                 onEvent(ProfileUiEvent.Navigate(screen = Screen.UserFormScreen()))
+                                 onEvent(ProfileUiEvent.NavigateToUserFormScreen)
                             })
                         HorizontalDivider(
                             modifier = Modifier.padding(horizontal = 16.dp),
@@ -218,7 +209,7 @@ fun MyProfileScreen(
                 }
             }
 
-            AppDialog(dialogState = uiState.dialog, onResult = { event ->
+            AppDialog(dialogState = uiState.dialog, onAction = { event ->
                 event?.let { event -> onEvent(event) }
                 onEvent(ProfileUiEvent.DismissDialog)
             })
