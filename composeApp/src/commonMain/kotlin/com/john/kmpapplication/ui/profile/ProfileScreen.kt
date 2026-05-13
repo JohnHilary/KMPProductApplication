@@ -47,13 +47,7 @@ import com.john.kmpapplication.ui.component.AppImage
 import com.john.kmpapplication.ui.component.FullScreenLoader
 import com.john.kmpapplication.ui.component.Screen
 import com.john.kmpapplication.ui.component.dialog.AppDialog
-import com.john.kmpapplication.ui.component.dialog.DialogRequest
 import com.john.kmpapplication.ui.navigation.AnimatedBottomBar
-import com.john.kmpapplication.util.StringValue.StringRes
-import kmpapplication.composeapp.generated.resources.Res
-import kmpapplication.composeapp.generated.resources.cancel
-import kmpapplication.composeapp.generated.resources.logout
-import kmpapplication.composeapp.generated.resources.logout_message
 import kotlinx.coroutines.flow.Flow
 
 
