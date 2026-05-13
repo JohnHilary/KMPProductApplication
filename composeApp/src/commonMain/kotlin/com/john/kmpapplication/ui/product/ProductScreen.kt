@@ -140,7 +140,7 @@ fun ProductScreen(
                                 modifier = Modifier.heightIn(min = 200.dp).fillMaxWidth(),
                                 product = it,
                                 onClick = {
-                                    onEvent(ProductUiEvent.NavigateToDetail(id = it.id))
+                                    onEvent(ProductUiEvent.OnProductClick(id = it.id))
                                 })
                         }
                     }

@@ -153,7 +153,7 @@ class ProductViewModel(
     fun onEvent(productUiEvent: ProductUiEvent) {
         when (productUiEvent) {
             is ProductUiEvent.OnFilterItemClicked -> onCategorySelected(category = productUiEvent.item)
-            is ProductUiEvent.NavigateToDetail -> {
+            is ProductUiEvent.OnProductClick -> {
                 viewModelScope.launch {
                     _uiEffect.send(NavigateToDetail(productUiEvent.id))
                 }
