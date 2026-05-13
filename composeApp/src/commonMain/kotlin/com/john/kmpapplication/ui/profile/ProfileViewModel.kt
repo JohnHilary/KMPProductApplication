@@ -42,6 +42,7 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
         viewModelScope.launch {
             setLoading(isLoading = true)
             userRepository.getUserFlow().collect { user ->
+                delay(1000)
                 _uiState.update { state ->
                     state.copy(
                         isLoading = false,
