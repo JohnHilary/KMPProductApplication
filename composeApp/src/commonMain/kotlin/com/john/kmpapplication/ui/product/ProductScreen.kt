@@ -51,7 +51,7 @@ import kotlinx.coroutines.flow.Flow
 @Composable
 fun ProductScreen(
     navController: NavController = rememberNavController(),
-    uiState: ProductUiState = ProductUiState(),
+    uiState: ProductUiState = ProductUiState.UnInitialized,
     uiEffect: Flow<ProductUiEffect>? = null,
     onEvent: (ProductUiEvent) -> Unit = {}
 ) {
@@ -82,7 +82,9 @@ fun ProductScreen(
             SearchBar(
                 modifier = Modifier.padding(end = 16.dp, top = 8.dp, bottom = 8.dp)
                     .background(MaterialTheme.colorScheme.background, CircleShape).fillMaxWidth(),
-                query = uiState.searchQuery,
+                query = (uiState as? ProductUiState.ShowData)
+                    ?.searchQuery
+                    .orEmpty(),
                 onQueryChange = { query ->
                     onEvent(ProductUiEvent.OnSearchQueryChanged(query))
                 })
@@ -101,10 +103,10 @@ fun ProductScreen(
             }
         }
     ) {
+        when (uiState) {
+            ProductUiState.Loading -> FullScreenLoader(isLoading = true)
 
-        when {
-
-            (uiState.allProducts.isNotEmpty()) -> {
+            is ProductUiState.ShowData -> {
                 LazyColumn(
                     modifier = Modifier.padding(
                         top = it.calculateTopPadding(),
@@ -132,7 +134,7 @@ fun ProductScreen(
                             })
                         Spacer(modifier = Modifier.height(8.dp))
                     }
-                    if (!uiState.isLoading) {
+                    if (!uiState.isRefreshing) {
                         items(uiState.products, key = { it.id }) {
                             ProductItem(
                                 modifier = Modifier.heightIn(min = 200.dp).fillMaxWidth(),
@@ -142,10 +144,11 @@ fun ProductScreen(
                                 })
                         }
                     }
-                    if (!uiState.isLoading && uiState.products.isEmpty()) {
+                    if (!uiState.isRefreshing && uiState.products.isEmpty()) {
                         item {
                             Box(
-                                modifier = Modifier.fillParentMaxSize(), contentAlignment = Alignment.Center
+                                modifier = Modifier.fillParentMaxSize(),
+                                contentAlignment = Alignment.Center
                             ) {
                                 Text(
                                     text = "No result found"
@@ -153,18 +156,29 @@ fun ProductScreen(
                             }
                         }
                     }
+                    item {
+                        Box(
+                            modifier = Modifier.fillParentMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            FullScreenLoader(isLoading = uiState.isRefreshing)
+                        }
+                    }
+
                 }
             }
 
-            (!uiState.isLoading && uiState.allProducts.isEmpty()) -> {
+            ProductUiState.UnInitialized -> TODO()
+            ProductUiState.NoData -> {
                 Box(modifier = Modifier.fillMaxSize()) {
-                    Text(text = "No products available", modifier = Modifier.align(Alignment.Center))
+                    Text(
+                        text = "No products available",
+                        modifier = Modifier.align(Alignment.Center)
+                    )
                 }
             }
-
         }
 
-        FullScreenLoader(isLoading = uiState.isLoading)
     }
 }
 

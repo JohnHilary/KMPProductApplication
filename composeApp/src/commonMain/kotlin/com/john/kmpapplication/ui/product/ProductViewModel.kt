@@ -6,6 +6,7 @@ import com.john.kmpapplication.data.Product
 import com.john.kmpapplication.domain.ProductRepository
 import com.john.kmpapplication.data.remote.ApiResult
 import com.john.kmpapplication.ui.product.ProductUiEffect.*
+import com.john.kmpapplication.util.Constant.FILTER_ALL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
@@ -13,6 +14,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
@@ -31,8 +33,12 @@ class ProductViewModel(
     private val repository: ProductRepository
 ) : ViewModel() {
 
-    private val _uiState: MutableStateFlow<ProductUiState> = MutableStateFlow(ProductUiState())
-    val uiState = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow<ProductUiState>(
+        ProductUiState.Loading
+    )
+
+    val uiState: StateFlow<ProductUiState> =
+        _uiState.asStateFlow()
 
     private val _uiEffect = Channel<ProductUiEffect>()
     val uiEffect = _uiEffect.receiveAsFlow()
@@ -44,7 +50,7 @@ class ProductViewModel(
     private fun initData() {
         viewModelScope.launch {
             try {
-                setLoading(true)
+                setUiState(ProductUiState.Loading)
 
                 val (productsResult, categoriesResult) = loadData()
 
@@ -55,23 +61,21 @@ class ProductViewModel(
                 }
 
                 val categories = when (categoriesResult) {
-                    is ApiResult.Success -> listOf("All") + categoriesResult.data
+                    is ApiResult.Success -> listOf(FILTER_ALL) + categoriesResult.data
                     is ApiResult.Error -> throw Exception(categoriesResult.message)
                     is ApiResult.Exception -> throw categoriesResult.throwable
                 }
 
-                _uiState.update {
-                    it.copy(
-                        allProducts = products,
-                        products = products,
-                        categories = categories,
-                    )
-                }
-                setLoading(false)
+
+                setUiState(ProductUiState.ShowData(
+                    allProducts = products,
+                    products = products,
+                    categories = categories,
+                ))
                 observeFilters()
 
             } catch (e: Exception) {
-                setLoading(false)
+                setUiState(ProductUiState.NoData)
                 _uiEffect.send(
                     ShowSnackbar(
                         e.message ?: "Something went wrong",
@@ -85,16 +89,25 @@ class ProductViewModel(
     @OptIn(FlowPreview::class)
     private fun observeFilters() {
         combine(
-            uiState.map { it.selectedCategory }.distinctUntilChanged(),
-            uiState.map { it.searchQuery }.debounce(300).distinctUntilChanged(),
-            uiState.map { it.allProducts }.distinctUntilChanged()
+            uiState
+                .map { (it as? ProductUiState.ShowData)?.selectedCategory }
+                .distinctUntilChanged(),
+
+            uiState
+                .map { (it as? ProductUiState.ShowData)?.searchQuery.orEmpty() }
+                .debounce(300)
+                .distinctUntilChanged(),
+
+            uiState
+                .map { (it as? ProductUiState.ShowData)?.allProducts.orEmpty() }
+                .distinctUntilChanged()
         )
         { category, query, products ->
 
             products.filter { product ->
 
                 val categoryMatch =
-                    category == null || category == "All" || product.category == category
+                    category == null || category == FILTER_ALL || product.category == category
 
                 val searchMatch =
                     query.isBlank() || product.title.contains(query, true)
@@ -102,15 +115,25 @@ class ProductViewModel(
                 categoryMatch && searchMatch
             }
         }.flowOn(Dispatchers.Default).drop(1).onEach {
-            setLoading(true)
+            val currentState = _uiState.value
+
+            if (currentState is ProductUiState.ShowData) {
+                _uiState.value = currentState.copy(
+                    isRefreshing = true
+                )
+            }
         }.map { filteredProducts ->
             delay(300)
             filteredProducts
         }.onEach { filteredProducts ->
-            _uiState.update {
-                it.copy(products = filteredProducts)
+            val currentState = _uiState.value
+
+            if (currentState is ProductUiState.ShowData) {
+                _uiState.value = currentState.copy(
+                    products = filteredProducts,
+                    isRefreshing = false
+                )
             }
-            setLoading(false)
         }.launchIn(viewModelScope)
     }
 
@@ -121,9 +144,9 @@ class ProductViewModel(
     }
 
 
-    private fun setLoading(isLoading: Boolean) {
+    private fun setUiState(uiState: ProductUiState) {
         _uiState.update {
-            it.copy(isLoading = isLoading)
+            uiState
         }
     }
 
@@ -143,14 +166,30 @@ class ProductViewModel(
     }
 
     private fun onCategorySelected(category: String) {
-        _uiState.update {
-            it.copy(selectedCategory = category)
+
+        _uiState.update { state ->
+
+            if (state is ProductUiState.ShowData) {
+                state.copy(
+                    selectedCategory = category
+                )
+            } else {
+                state
+            }
         }
     }
 
     private fun onSearchQuery(query: String) {
-        _uiState.update {
-            it.copy(searchQuery = query)
+
+        _uiState.update { state ->
+
+            if (state is ProductUiState.ShowData) {
+                state.copy(
+                    searchQuery = query
+                )
+            } else {
+                state
+            }
         }
     }
 
