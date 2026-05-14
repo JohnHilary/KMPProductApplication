@@ -12,6 +12,5 @@ sealed interface ProductUiState {
         val selectedCategory: String? = null,
         val searchQuery: String = ""
     ) : ProductUiState
-    data object UnInitialized : ProductUiState
     data object NoData : ProductUiState
 }
