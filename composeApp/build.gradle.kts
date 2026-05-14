@@ -75,6 +75,7 @@ kotlin {
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)
             implementation("io.ktor:ktor-client-auth:3.4.0")
+            implementation("com.valentinilk.shimmer:compose-shimmer:1.4.0")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -34,6 +35,7 @@ import androidx.navigation.compose.rememberNavController
 import com.john.kmpapplication.ui.BaseScreen
 import com.john.kmpapplication.ui.component.AppImage
 import com.john.kmpapplication.ui.component.FullScreenLoader
+import com.valentinilk.shimmer.shimmer
 import kotlinx.coroutines.flow.Flow
 
 
@@ -81,8 +83,16 @@ fun ProductDetailsScreen(
     }, snackbarHostState = snackbarHostState, scrollBehavior = scrollBehavior, title = {
         Text(text = "Product Details", fontWeight = FontWeight.Bold)
     }) {
+        Column(
+            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(
+                top = (it.calculateTopPadding() + 16.dp),
+                start = 16.dp,
+                end = 16.dp,
+                bottom = (it.calculateBottomPadding() + 16.dp)
+            )
+        ) {
         when (uiState) {
-            ProductDetailUiState.Loading -> FullScreenLoader(isLoading = true)
+            ProductDetailUiState.Loading -> ProductDetailShimmer()
 
             ProductDetailUiState.NoData -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -91,14 +101,7 @@ fun ProductDetailsScreen(
             }
 
             is ProductDetailUiState.ShowData -> {
-                Column(
-                    modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(
-                        top = (it.calculateTopPadding() + 16.dp),
-                        start = 16.dp,
-                        end = 16.dp,
-                        bottom = (it.calculateBottomPadding() + 16.dp)
-                    )
-                ) {
+
                     Spacer(modifier = Modifier.height(12.dp))
                     AppImage(
                         imageUrl = uiState.product.image,
@@ -113,12 +116,72 @@ fun ProductDetailsScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(text = uiState.product.category)
 
-                }
                 FullScreenLoader(isLoading = uiState.isLoading)
             }
 
             ProductDetailUiState.UnInitialized -> Unit
         }
+}
+    }
+}
 
+@Composable
+fun ProductDetailShimmer() {
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .shimmer()
+    ) {
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(220.dp)
+                .background(
+                    Color.LightGray,
+                    RoundedCornerShape(12.dp)
+                )
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.7f)
+                .height(24.dp)
+                .background(
+                    Color.LightGray,
+                    RoundedCornerShape(8.dp)
+                )
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.4f)
+                .height(20.dp)
+                .background(
+                    Color.LightGray,
+                    RoundedCornerShape(8.dp)
+                )
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        repeat(4) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(18.dp)
+                    .padding(vertical = 4.dp)
+                    .background(
+                        Color.LightGray,
+                        RoundedCornerShape(8.dp)
+                    )
+            )
+        }
     }
 }

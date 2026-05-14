@@ -8,6 +8,7 @@ import com.john.kmpapplication.data.remote.ApiResult
 import com.john.kmpapplication.domain.ProductRepository
 import com.john.kmpapplication.ui.component.Screen
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -46,6 +47,7 @@ class ProductDetailViewModel(
     private fun getProduct(id: Int?) {
         viewModelScope.launch {
             setUiState(uiState = ProductDetailUiState.Loading)
+            delay(1000)
             when (val result = repository.getProduct(id)) {
                 is ApiResult.Success -> setUiState(uiState = ProductDetailUiState.ShowData(product = result.data))
 
